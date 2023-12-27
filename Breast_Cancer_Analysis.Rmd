@@ -1,0 +1,104 @@
+# BREAST CANCER ANALYSIS
+
+Along this Rnotebook we will analyze the features obtained from the [Breast Cancer's Dataset](https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic). We will apply the methods and techniques seen during the course of Multivariate Statistics of the University of Granada.
+
+## **1. Loading packages and data sets**
+
+### 1.1 Loading and installing R packages
+
+```{r warning=FALSE, message=FALSE}
+
+#########################################
+# Loading necessary packages and reason #
+#########################################
+
+# This is an example of the first installation of a package
+# Only runs once if the package is not installed
+# Once it is installed this sentence has to be commented (not to run again)
+install.packages("ggplot2")
+install.packages("summarytools")
+
+# Package required to call 'freq' and 'descr' functions (descriptive statistics)
+library(summarytools)
+
+# Package required to call 'ggplot' function
+library(ggplot2)
+
+# Package required to call 'ggarrange' function
+library(ggpubr)
+
+# Package required to call 'scatterplot3d' function
+library(scatterplot3d)
+
+# Package required to call 'melt' function
+library(reshape2)
+
+# Package required to call 'mvn' function
+library(MVN)
+
+# Package required to call 'boxM' function
+library(biotools)
+
+# Package required to call 'summarise' function
+library(dplyr)
+
+# Package required to call 'createDataPartition' function
+library(caret)
+
+# Package required to call 'read.spss' function (loading '.spss' data format)
+library(foreign)
+
+# Package required to call 'read_xlsx' function (loading '.xlsx' data format)
+library(readxl)
+
+# Package required to load the data set 'RBGlass1'
+library(archdata)
+
+# Package required to call 'cortest.bartlett' function
+library(psych)
+
+# Package required to call 'fviz_pca_var, fviz_pca_ind and fviz_pca' functions
+library(factoextra)
+
+# Package required to call 'scatterplot3d' function
+library(scatterplot3d)
+
+# Package required to call 'factanal' function
+library(stats)
+
+# Package required to call 'freq' function
+library(summarytools)
+
+# Package required to call 'cortest.bartlett' function
+library(psych)
+
+# Package required to call 'hetcor' function
+library(polycor)
+
+# Package required to call 'ggcorrplot' function
+library(ggcorrplot)
+
+# Package required to call 'corrplot' function
+library(corrplot)
+
+# Package required to call 'rplot' function
+library(corrr)
+
+```
+
+### 1.2 Loading data set
+
+```{r}
+#file path
+setwd("C:/Users/valentin/Desktop/DGIIM 5/1 CUATRI/MULTIVARIANTE/PRACTICAS/PRACTICA_FINAL/Breast_Cancer_Analysis")
+
+#loading data. We haven seen that the file has the values of each feature separated by "," so we use as argument the specific separator ",". The file does not have header so we also specify it.
+datos <- read.table("wdbc.data", header = FALSE, sep=",")
+
+#verifying data.
+head(datos)
+```
+
+In the previous table we can see that the features has not the right name, even, in the table there are some feature that we are not interesting in our study, as they are used in machine learning's context to make predictions and not in multivariate analyzation.
+
+In the following cells we will preprocess the table to erase these columns, and to rename the features correctly, before starting with any research of our data.
