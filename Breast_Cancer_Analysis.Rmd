@@ -15,8 +15,10 @@ Along this Rnotebook we will analyze the features obtained from the [Breast Canc
 # This is an example of the first installation of a package
 # Only runs once if the package is not installed
 # Once it is installed this sentence has to be commented (not to run again)
-install.packages("ggplot2")
-install.packages("summarytools")
+#install.packages("ggplot2")
+#install.packages("summarytools")
+#install.packages("tidyverse")
+#install.packages("pastecs")
 
 # Package required to call 'freq' and 'descr' functions (descriptive statistics)
 library(summarytools)
@@ -84,6 +86,13 @@ library(corrplot)
 # Package required to call 'rplot' function
 library(corrr)
 
+#  Package required to call 'ggplot' function
+library(ggplot2)
+library(ggpubr)
+
+
+library(tidyverse)
+
 ```
 
 ### 1.2 Loading data set
@@ -93,12 +102,335 @@ library(corrr)
 setwd("C:/Users/valentin/Desktop/DGIIM 5/1 CUATRI/MULTIVARIANTE/PRACTICAS/PRACTICA_FINAL/Breast_Cancer_Analysis")
 
 #loading data. We haven seen that the file has the values of each feature separated by "," so we use as argument the specific separator ",". The file does not have header so we also specify it.
-datos <- read.table("wdbc.data", header = FALSE, sep=",")
+dataframe <- read.table("wdbc.data", header = FALSE, sep=",")
 
 #verifying data.
-head(datos)
+head(dataframe)
 ```
 
-In the previous table we can see that the features has not the right name, even, in the table there are some feature that we are not interesting in our study, as they are used in machine learning's context to make predictions and not in multivariate analyzation.
+In the previous table we can see that the features has not the right name, even, in the table there are some feature that we are not interesting in our study, as they are used in machine learning's context to make predictions and not in multivariate analysis.
 
 In the following cells we will preprocess the table to erase these columns, and to rename the features correctly, before starting with any research of our data.
+
+```{r}
+
+#Columns' names from the dataset description
+colnames<-c('ID','DIAGNOSIS','radius1', 'texture1','perimeter1','area1','smoothness1','compactness1','concavity1','concave_points1','symmetry1','fractal_dimension1','radius2','texture2','perimeter2','area2','smoothness2','compactness2','concavity2','concave_points2','symmetry2','fractal_dimension2','radius3','texture3','perimeter3','area3','smoothness3','compactness3','concavity3','concave_points3','symmetry3','fractal_dimension3')
+
+#changing columns' names
+colnames(dataframe)<- colnames
+
+#erasing the first two columns 
+datos <- dataframe[, -c(1, 2)]
+
+#finally we add an extra column to our dataframe which funtion is just identify each row, but regarding our order and not the dataframe's one.
+datos$ID <- 1:nrow(datos)
+datos <- datos[, c('ID', names(datos)[-ncol(datos)])]
+
+#showing the data to verify the changes
+datos
+```
+
+```{r}
+#discomment in case the file with the preprocessed dataframe is needed.
+#write.table(datos, file = 'dataframe.csv', sep = ',', row.names = FALSE)
+```
+
+## 2. Univariate Exploratory Analysis
+
+Firstly, we would like to give an brief description of the data, to be more aware of what types of data we are working on.
+
+The public dataset we are working on is related to the Breast Cancer. All the values given are computed from digitized images of a fine needle aspirate (FNA) of a breast mass. They describe **characteristics of the cell nucleus**.
+
+The dataframe consists on 30 continuous and numeric features (plus the ID and Target one). Each feature is actually a real-value computed for each cell nucleus.
+
+In our opinion, we belief that this dataset is clearly a dataset to perform Machine Learning, as they even included one Target feature. The features are intuitive and the idea behind the dataset is also clear and concise; predict the type of Breast Cancer (malignant or bening).
+
+So, after this quick analysis of the dataset we can start to perform the Univariate Exploratory Analysis.
+
+### 2.1 Data grouping or recoding
+
+Regarding the types of values we have on the dataset and the range of the domain where the features take their values, we are not interested on perform data-grouping or to recode them.
+
+### 2.2 Missing values
+
+Another key part of the Univariate Exploratory Analysis is to identify missing values. On the following cells we are going to compute the porcentage of missing values of each feature. ![]()
+
+```{r}
+# compute the missing values for each feature of our dataset
+missing_values <- sapply(datos, function(x) sum(is.na(x))/length(x) * 100)
+
+# we plot the results of the missing values data 
+barplot(missing_values, main = "Porcentage of missing values", xlab = "", ylab = "Porcentage of missing values", col = "steelblue", las = 2, ylim = c(0, 100))
+
+```
+
+In the plot we can see clearly that **there are not missing values.** We are not need in our case to study the random pattern of the missing values.
+
+If we would have obtained more than 5% of missing values on any feature, we would have to analyze the random patterns. As we have continuous variables we would have needed to apply a Student test. Regarding the results of the applied test we would have obtained that the pattern is random or not, and in both cases, replacing the missing values by the mean or median.
+
+### 2.3 Classical numeric descriptive analysis
+
+Following, we are going to compute basic statistics measures to gather more information about or data. As the variables are quantitative, we are going to compute **basic numerical descriptive statistics, their histograms, density and boxplot.**
+
+```{r}
+# for every feature except the ID
+for(col in names(datos)[-1]) {
+
+  cat("\nSummary of the feature: ", col, "\n")
+  
+  # showing the summary
+  print(summary(datos[[col]]))
+}
+
+```
+
+As the function we have used to display this values is maybe too simple, we are going to display more measures about our features to understand better our dataset.
+
+```{r}
+#compute the measures for all features except the ID
+breast_cancer_dataset <- datos[, -1]
+descr_res <- descr(breast_cancer_dataset)
+
+#show adequately the table
+print((descr_res), method = 'render')
+```
+
+Next, we will plot some interesting graphs of each feature, such as density function, histogram and boxplot.
+
+```{r}
+
+for(col in names(datos)[-1]) {
+
+  # creating density, histogram and boxplot
+  p1 <- ggplot(datos, aes_string(x = col)) + geom_density() +
+    labs(title = paste("Density function of", col), x = col, y = "Values") +
+    theme(plot.title = element_text(size = 8, hjust = 0.5))
+  
+  p2 <- ggplot(datos, aes_string(x = col)) + geom_histogram(bins = 30) +
+    labs(title = paste("Histogram of", col), x = col, y = "Values") +
+    theme(plot.title = element_text(size = 8, hjust = 0.5))
+  
+  p3 <- ggplot(datos, aes_string(x = col)) +
+    geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.size = 2) +
+    coord_flip() + labs(title = paste("Boxplot of", col), x = "Values", y = "") +
+    theme(plot.title = element_text(size = 8, hjust = 0.5))
+  
+  # show the graphs
+  print(ggarrange(p1, p2, p3, nrow = 1, common.legend = FALSE))
+}
+
+
+```
+
+Just as an addition to all information gathered, we are interested on seeing the Target feature of the dataset, "Diagnosis". Therefore, we will show some graphical outputs about this categorical variable.
+
+```{r}
+# frequency tables
+freq(dataframe[2])
+```
+
+Just as a reminder, B = benign and M = malignant.
+
+```{r}
+
+# create the pie chart and bar graph for the Target column (DIAGNOSIS)
+p1 <- ggplot(dataframe, aes(x = factor(1), fill = DIAGNOSIS)) + geom_bar() +
+  coord_polar("y") + labs(x = "DIAGNOSIS", y = "%")
+  
+p2 <- ggplot(dataframe, aes(x = factor(1), fill = DIAGNOSIS)) + geom_bar() +
+  labs(x = "DIAGNOSIS", y = "%")
+
+# display the graphs
+print(ggarrange(p1, p2, nrow = 1, ncol = 2, common.legend = TRUE))
+```
+
+### 2.4 Outliers
+
+In this section we will try to identify outliers in each feature as some methods we will use along this proyect are sensitive to the presence of outliers.
+
+We have to remind that all our features are numerical variables so we can apply some graphs methods to identify intuitively the outliers. It is remarkable that firstly we standarize the data because, as we can see in the previous sections, our features have different scales.
+
+```{r}
+
+# standarize
+sca <- scale(datos[-1])
+
+# transform data to large format
+datos_largos <- as.data.frame(sca) %>% 
+  rownames_to_column(var = "ID") %>% 
+  pivot_longer(cols = -ID, names_to = "Variable", values_to = "Valor")
+
+# reformat the graphical options
+options(repr.plot.width = 10, repr.plot.height = 8)
+
+# create boxplot
+p <- ggplot(datos_largos, aes(x = Variable, y = Valor, fill = Variable)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(title = "Outliers", x = "All explanatory variables", y = "Values") +
+  scale_fill_discrete(name = "Variables") 
+
+# display the graphs
+print(p)
+
+```
+
+Another way of outliers' visualization:
+
+```{r}
+
+columnas <- colnames(datos[-1])
+
+# boxplot for each feature
+for (col in columnas) {
+  p <- ggplot(datos[-1], aes_string(x = col)) +
+    geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.size = 2) +
+    coord_flip() +
+    labs(title = paste("Boxplot of", col), x = "Values", y = "")
+  
+  # show the graph
+  print(p)
+}
+
+```
+
+In both graphs we can see that there are outliers in almost every feature. Regarding this, we can eliminate them or replace by the mean or median. As this is not rigurous we are going to take the one option who give us better results.
+
+```{r}
+# ---   OUTLIERS METHODOLOGY ---
+
+# replacing outliers by the mean
+reemplazar_outliers <- function(x) {
+  qnt <- quantile(x, probs=c(.25, .75), na.rm = TRUE)
+  H <- 1.5 * IQR(x, na.rm = TRUE)
+  outliers <- x < (qnt[1] - H) | x > (qnt[2] + H)
+  x[outliers] <- mean(x[!outliers])
+  return(x)
+}
+
+# we apply the function to every feature of our dataset
+datos_preprocessed <- datos %>% mutate(across(-1, reemplazar_outliers))
+
+
+```
+
+```{r}
+datos_preprocessed = datos
+```
+
+We have created a function that erase the outliers, just taking in count the quantiles of each feature and leaving the values which are not considered as outliers.
+
+We will replot the boxplot of each feature with the changes.
+
+```{r}
+columnas <- colnames(datos_preprocessed[-1])
+
+# boxplot for each feature
+for (col in columnas) {
+  p <- ggplot(datos_preprocessed[-1], aes_string(x = col)) +
+    geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.size = 2) +
+    coord_flip() +
+    labs(title = paste("Boxplot of", col," (without outliers)"), x = "Values", y = "")
+  
+  # show the graph
+  print(p)
+}
+```
+
+### 2.5 Univariate normality
+
+As many techniques can not avoid the assumption of normality is necessary to check the distribution of each feature of the dataset. In order to analyze their distribution we are going to use two techniques. The first one is graphical, using the funcion qqplot, and the second one is about applying the Univariate normality test (Shapiro-Wilk).
+
+```{r}
+columnas <- colnames(datos_preprocessed[-1])
+
+# creating qqplot
+for (col in columnas) {
+  
+  p <- ggplot(data = datos_preprocessed, aes(sample = get(col))) +
+    stat_qq(distribution = qnorm, dparams = list(mean = mean(datos_preprocessed[[col]], na.rm = TRUE), sd = sd(datos_preprocessed[[col]], na.rm = TRUE))) +
+    geom_abline(color = "red", linetype = "dashed") +  # Agrega una línea diagonal
+    ggtitle(paste("Q-Q plot of", col)) +
+    xlab("Theoretical Quantiles") +
+    ylab("Sample Quantiles")
+  
+  print(p)
+}
+
+
+```
+
+```{r}
+
+columnas <- names(datos_preprocessed)[-1]
+
+# Crea un histograma para cada característica
+for (j0 in columnas) {
+  # Genera el histograma
+  p <- ggplot(datos_preprocessed, aes_string(x = j0)) +
+    geom_histogram(aes(y = ..density..), bins = 30, fill = "lightblue", color = "black") +
+    geom_density(color = "red", lwd = 1) +
+    labs(title = paste("Histogram of", j0), x = j0, y = "Density")
+  
+  # Muestra el histograma
+  print(p)
+}
+
+```
+
+With this exploratory analysis we can have a general idea of the possible normal distribution of the univariate variables. However, as these are graphical outputs and the test is just our "sight" we will apply some more mathematical and numerical test to accept the assumption of normality.
+
+The null hypothesis of the test is that the data **follow a univariate normal distribution.** This hypothesis is rejected if the p-value given by the Shapiro-Wilk test is less than 0.05.
+
+```{r}
+#reformat the data
+datos_tidy <- melt(datos_preprocessed, id.vars = "ID", variable.name = "variable", value.name = "value")
+
+# Shapiro-Wilk test for each variable.
+resultados <- aggregate(value ~ variable, data = datos_tidy, FUN = function(x){shapiro.test(x)$p.value})
+
+# new column to find if the value obtained is greater than the p-value
+resultados$NORMALITY <- ifelse(resultados$value < 0.05, "NO", "YES")
+
+# display results
+print(resultados)
+
+```
+
+Looking on the results obtained we can see that despite we obtained in the graphical outputs that the most part of the variables followed a normal distribution, actually they do not follow a normal distribution. Thanks to the Shapiro-Wilk test we were able to prove it, and it is a important test always to contrast what "we think" with the mathematically right results.
+
+## 3. Multivariate Exploratory Analysis
+
+### 3.1
+
+### 3.2
+
+### 3.3
+
+### 3.4
+
+### 3.5
+
+### 3.6 Multivariate Normality of the data
+
+As the multivariate normality can be affected by the presence of multivariate outliers we will plot again the outliers in relation with the Chi-Square qqplot.
+
+```{r}
+outliers <- mvn(data = datos_preprocessed[,-1], mvnTest = "hz", multivariateOutlierMethod = "quan")
+
+
+```
+
+Therefore, as the number of outliers is enough small, we can perfom the following tests in order to find some evidence of lack of multivariate normality.
+
+```{r}
+royston_test <- mvn(data = datos_preprocessed[,-1], mvnTest = "royston", multivariatePlot = "qq")
+royston_test$multivariateNormality
+
+```
+
+```{r}
+hz_test <- mvn(data = datos_preprocessed[,-1], mvnTest = "hz")
+hz_test$multivariateNormality
+```
