@@ -1,0 +1,133 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{csvsimple}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{algorithm}
+\makeatletter
+\renewcommand{\ALG@name}{Algoritmo}
+\makeatother
+\usepackage{algpseudocode}
+\usepackage[hidelinks]{hyperref}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+
+\newtheorem{theorem}{Teorema}[section]
+\newtheorem{prop}{Proposición}[section]
+\newtheorem{lema}{Lema}[section]
+\newtheorem{col}{Colorario}[section]
+
+\theoremstyle{definition}
+\newtheorem{exmp}{Ejemplo}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definición}[section]
+
+\renewcommand*\contentsname{Índice} %Nombre del indice
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+
+
+\begin{document}
+\lstset{
+	basicstyle=\footnotesize,
+	extendedchars=true,
+	literate={á}{{\'a}}1 {ã}{{\~a}}1 {é}{{\'e}}1 {ú}{{\'u}}1 {ó}{{\'o}}1,
+	backgroundcolor=\color{black!5}
+	}
+	
+\begin{titlepage}
+	\centering
+	{\includegraphics[scale=0.5]{Logo_UGR.png}\par}
+	\vspace{1cm}
+	{\bfseries\Large Science Faculty \par}
+	\vspace{0.5cm}
+	{\bfseries\itshape\large Multivariate Statics \par}
+	\vspace{2.5cm}
+	{\scshape\Huge Influence of diverse indicators in the diagnosis of breast cancer\par}
+	\vspace{3cm}
+	{\itshape\Large Bachelor's degree in Computer Science and Mathematics}
+	\vfill
+	{\Large Authors: \par}
+	{\Large Julián Garrido Arana \par}
+	{\Large Javier Gómez López \par}
+	{\Large Juan Valentín Guerrero Cano \par}
+	
+	\vfill
+	{\Large December 2023 \par}
+\end{titlepage}
+
+\thispagestyle{empty}
+\null
+\vfill
+
+%%Información sobre la licencia
+\parbox[t]{\textwidth}{
+  \includegraphics[scale=0.05]{by-nc-sa.png}\\[4pt]
+  \raggedright % Texto alineado a la izquierda
+  \sffamily\large
+  {\Large This work is distributed under a CC BY-NC-SA 4.0 license.}\\[4pt]
+  You are free to distribute and adapt the material as long as you acknowledge\\
+  the original authors of the document, do not use it for commercial purposes,\\
+  and distribute it under the same license.\\[4pt]
+  \texttt{creativecommons.org/licenses/by-nc-sa/4.0/}
+}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Abstract}
+This study responds to the urgent need for a comprehensive understanding of factors influencing breast cancer diagnosis, a disease with substantial global health implications. Employing advanced statiscal techniques such as discriminant analysis, factorial analysis for dimensional reduction, and principal component analysis, the research aims to identify key indicators for more accurate breast cancer classification. \\
+
+By improving diagnostic precision, the study contributes to early and personalized interventions. Additionaly, it seeks to unravel complex interrelationships among various indicators, offering potential insights for advancements in breast cancer research. In essence, this work addresses the practival imperative to enhance breast cancer diagnostics and contributes to ongoing efforts in understanding the intricate aspects of this disease, ultimately advancing medical knowledge and breast cancer treatment.
+
+\newpage
+
+\section{Introduction}
+Within the intricate realm of breast cancer, achieving precise diagnosis stands as a pivotal frontier with profound implications for patient outcomes. Recognizing the limitations of conventional diagnostic paradigms, this study embarks on a meticulous exploration, employing advanced statistical techniques—discriminant analysis, dimensionality reduction through factorial analysis, principal component analysis, etc. The focal point is the unraveling of the intricate tapestry of indicators inherent in breast cancer datasets, particularly those associated with the diverse morphological forms exhibited across various cancer samples. \\
+
+The amalgamation of genetic, clinical, and morphological indicators demands a nuanced analytical approach. Through discriminant analysis, we aim to uncover distinctive patterns characterizing benign and malignant tumors, pushing beyond the constraints of traditional diagnostic methods. Simultaneously, the application of factorial and principal component analyses allows us to distill essential information from the complex dataset, shedding light on the factors that truly drive breast cancer classification. \\
+
+This statistical exploration extends beyond immediate diagnostic applications. By identifying morphological indicators related to diverse cancer samples, we not only refine diagnostic precision but also offer insights into the underlying biological relationships governing the manifestation of different forms of breast cancer. This statistical lens enables us to navigate the complexities of the disease, revealing hidden patterns and connections that may inform future avenues of research. \\
+
+In this journey, our objective is twofold: to enhance the accuracy of breast cancer diagnosis by identifying morphological indicators specific to various cancer forms and to contribute to a broader understanding of the disease's intricacies. As we dissect the statistical nuances associated with morphological variations, we envision a future where diagnostic tools are not only more precise but also inherently adaptable to the diverse manifestations of breast cancer. Through this statistical lens, our exploration aspires to redefine the paradigm of breast cancer diagnosis, providing a foundation for more effective interventions and advancing the collective understanding of this complex and multifaceted disease
+
+\end{document}
