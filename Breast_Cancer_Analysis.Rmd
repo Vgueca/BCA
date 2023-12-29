@@ -98,7 +98,13 @@ library(tidyverse)
 ### 1.2 Loading data set
 
 ```{r}
+
 #file path
+
+#Valentin's path
+#setwd("C:/Users/valentin/Desktop/DGIIM 5/1 CUATRI/MULTIVARIANTE/PRACTICAS/PRACTICA_FINAL/Breast_Cancer_Analysis")
+
+#Javi's path
 setwd("/home/javi5454/Desktop/Github/Breast_Cancer_Analysis")
 
 #loading data. We haven seen that the file has the values of each feature separated by "," so we use as argument the specific separator ",". The file does not have header so we also specify it.
@@ -476,7 +482,7 @@ cortest.bartlett(cor(datos_preprocessed_scale), 569) # 569 is the sample size
 
 Due to $p-value$ is 0\<0.001, we can assume that there is no independence, so it is logical to propose dimension's reduction trough a Principal Component Analysis or Factorial Analysis.
 
-### 3.2 Principal Components Analysis (PCA)  
+### 3.2 Principal Components Analysis (PCA)
 
 The following code performs the PCA, obtaining the eigenvectors of each component and them eigenvalues (variance of each one).
 
