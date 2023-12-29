@@ -98,7 +98,13 @@ library(tidyverse)
 ### 1.2 Loading data set
 
 ```{r}
+
 #file path
+
+#Valentin's path
+#setwd("C:/Users/valentin/Desktop/DGIIM 5/1 CUATRI/MULTIVARIANTE/PRACTICAS/PRACTICA_FINAL/Breast_Cancer_Analysis")
+
+#Javi's path
 setwd("/home/javi5454/Desktop/Github/Breast_Cancer_Analysis")
 
 #loading data. We haven seen that the file has the values of each feature separated by "," so we use as argument the specific separator ",". The file does not have header so we also specify it.
