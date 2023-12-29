@@ -476,7 +476,7 @@ cortest.bartlett(cor(datos_preprocessed_scale), 569) # 569 is the sample size
 
 Due to $p-value$ is 0\<0.001, we can assume that there is no independence, so it is logical to propose dimension's reduction trough a Principal Component Analysis or Factorial Analysis.
 
-### 3.2 Principal Components Analysis (PCA)  
+### 3.2 Principal Components Analysis (PCA)
 
 The following code performs the PCA, obtaining the eigenvectors of each component and them eigenvalues (variance of each one).
 
@@ -542,16 +542,154 @@ for(element in PCA$sdev^2){
   if(element > mean(PCA$sdev^2)){
     print(colnames(PCA$x)[counter])
   }
-  counter<- counter + 1
+  counter<-counter + 1
 }
 ```
 
 So, we would only consider the first 6th components. They accumulate near to 82% of the explained variance. Each principal component is obtained as linear combination of all components with the coefficients indicated at the columns of rotation matrix.
 
-There is the possibility of representing different pairwise comparisons between the principal components, but since we have 6 principal components, we would have to create $\frac{6!}{2} = 360$ graphs, which is impractical.
+There is the possibility of representing different pairwise comparisons between the principal components, but since we have 6 principal components, we would have to create $\frac{6!}{2} = 360$ graphs, which is impractical. Instead, we will only make the comparison graphs between first and second principal component, which are in fact, the two ones with most part of the explicable variance.
+
+Firstly, the following graphical outputs show the projection of the variables in two dimensions. Display the weight of the variable in the direction of the principal component.
 
 ```{r}
+p1<-fviz_pca_var(PCA,repel = T, col.var = "cos2", legend.title="Distance", title="Variables")+theme_bw()
 
+p1
+```
+
+It is also possible to represent the observations. As well as identify with colors those observations that explain the greatest variance of the principal components.
+
+```{r}
+p1<-fviz_pca_ind(PCA, col.ind = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
+                 repel = T, legend.title = "Contrib.var", title ="Recrods") + theme_bw()
+
+p1
+```
+
+Now, joint representation of variables and observations. Relates the possible relationships between the contributions of the records to the variances of the components and the weight of the variables in each principal component.
+
+```{r}
+p1<-fviz_pca(PCA, alpha.ind = "contrib", col.var="cos2", col.ind="seagreen", gradient.cols = c("#FDF50E", "#FD960E", "#FD1E0E"), repel = T, legend.title = "Distancia") + theme_bw()
+
+p1
+```
+
+### 3.4 Factorial Analysis
+
+First of all in this section, different graphical outputs are illustrated below that provide an intuitive idea of correlation between the variables. A *trained eye* could anticipate the appropriate number of factor with this visual information.
+
+```{r}
+# Polychoric correlation matrix
+poly_cor<-hetcor(datos_preprocessed[-1])$correlations
+
+ggcorrplot(poly_cor, type="lower", hc.order = T)
+```
+
+Another interesting visual representation is the following:
+
+```{r}
+corrplot(cor(datos_preprocessed[-1]), order="hclust", tl.col="black", tl.cex = 1)
+```
+
+One last representation is the following:
+
+```{r}
+datos_preprocessed_correlations<-correlate(datos_preprocessed[-1]) #Correlations object
+rplot(datos_preprocessed_correlations, legend = T, colours = c("firebrick1", "black", "darkcyan"), print_cor = T)
+```
+
+Observing the graphical outputs, it seems to be between 3 and 4 groups for latent variables with high correlation with a group of observable variables and low correlation with the others. It can help us to decide which is the optimum number of factor for our Factorial Analysis.
+
+Now, we must choose a method to extract the factors: main factor, likelihood, etc. First, we will compare the outputs of the maximum likelihood method and minimal residual model. We will calculate 3 factors due to the last graphs.
+
+```{r}
+### Test of two models with three factors
+model1<-fa(poly_cor, nfactors = 3, rotate = "none", fm="mle") #likhelihood method
+
+model2<-fa(poly_cor, nfactors = 3, rotate = "none", fm = "minres") #minimal residual model
+
+# Outputs of these models: factorial matrices, etc.
+
+print("Model 1: maximum likelihood esthimator")
+model1$loadings
+
+print("Model 2: minimal residual model")
+model2$loadings
+```
+
+Now, a comparison of the communalities of these two methods is illustrated. It appears that communalities of the likelihood model are lower than those of the minimum residual model.
+
+```{r}
+# Comparing communalities
+sort(model1$communality, decreasing = T)->c1
+sort(model2$communality, decreasing = T)->c2
+
+cbind(c1,c2)
+```
+
+A comparison of uniqueness is also performed. That is the proportion of variance that has not been explained by the factor (1 - communality)
+
+```{r}
+sort(model1$uniquenesses, decreasing = T)->u1
+sort(model2$uniquenesses, decreasing = T)->u2
+cbind(u1,u2)
+```
+
+We can observe that with the minimal residual model we obtain higher values, then latent factors obtained with these methods explains better the variance of observed variables.
+
+### 3.5 Choosing the optimal number of factors to consider
+
+There are different criteria, among which the Scree plot and parallel analysis stand out. The **Scree plot** consist in represent the scree plot obtained from the representation of eigenvalues in descendant order at Y-axis and the number of latent factors at X-axis. Joining the points we obtain a figure that starts with a strong drop and then a leveling-off. The methods indicates that we have to choose the number of factors where the graphical output makes an "elbow". The parallel analysis is a technique designed to help take some of the subjectivity out of interpreting the scree plot. Graphically, it identifies the point where the cumulative explained variance of real data significantly surpasses the average cumulative explained variance of random data, determining the optimal number of factors to retain. This method helps prevent overextraction of factors.
+
+```{r}
+# Scree plot
+scree(poly_cor)
+```
+
+```{r}
+#Parallel anaylisis
+fa.parallel(poly_cor, n.obs=100, fa="fa", fm="minres")
+```
+
+In this case, we will chose 5 factors due to parallel analysis.
+
+Other way to study the optimal number of factors is with the following hypothesis test, which contrast if the number of factors is enough or not.
+
+```{r}
+factanal(datos, factors=5, rotation="none", lower=0.02)
+```
+
+So, we do not reject the null hypothesis, and we will use 5 factors.
+
+Finally, we will make an estimation of the factorial model with 5 factors. We implement a varimax rotation to seek a simpler interpretation.
+
+```{r}
+varimax_model<-fa(poly_cor, nfactors=5, rotate="varimax", fa="minres")
+```
+
+We obtain a warning telling us an ultra-Heywood case was detected. Since communalities are squared correlations, you would expect them always to lie between 0 and 1. It is a mathematical peculiarity of the common factor model, however, that final communality estimates might exceed 1. If a communality exceeds 1, it is an ultra-Heywood case. It implies that some unique factor has negative variance, a clear indication that something is wrong. One possible cause is that we are using too much factors. Let's try with 3 factors:
+
+```{r}
+varimax_model<-fa(poly_cor, nfactors=3, rotate="varimax", fa="minres")
+```
+
+Here we do not get any warning of an ultra-Heywood case. We will run again our previous hypothesis test, but now with three factors.
+
+```{r}
+factanal(datos, factors=3, rotation="none", lower=0.03)
+```
+
+So, then we will use 3 factors in our model. Now, the rotated factorial matrix is shown.
+
+```{r}
+print(varimax_model$loadings, cut = 0)
+```
+
+Visually we could make the effort to see what variables each correlates with one of the factors, but it is very tedious. So we use the following representation in diagram mode.
+
+```{r}
+fa.diagram(varimax_model)
 ```
 
 ### 3.6 Multivariate Normality of the data
@@ -559,9 +697,7 @@ There is the possibility of representing different pairwise comparisons between 
 As the multivariate normality can be affected by the presence of multivariate outliers we will plot again the outliers in relation with the Chi-Square qqplot.
 
 ```{r}
-outliers <- mvn(data = datos_preprocessed[,-1], mvnTest = "hz", multivariateOutlierMethod = "quan")
-
-
+outliers <- mvn(data = datos[,-1], mvnTest = "hz", multivariateOutlierMethod = "quan")
 ```
 
 Therefore, as the number of outliers is enough small, we can perfom the following tests in order to find some evidence of lack of multivariate normality.
