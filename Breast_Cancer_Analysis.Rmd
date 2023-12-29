@@ -99,7 +99,7 @@ library(tidyverse)
 
 ```{r}
 #file path
-setwd("C:/Users/valentin/Desktop/DGIIM 5/1 CUATRI/MULTIVARIANTE/PRACTICAS/PRACTICA_FINAL/Breast_Cancer_Analysis")
+setwd("/home/javi5454/Desktop/Github/Breast_Cancer_Analysis")
 
 #loading data. We haven seen that the file has the values of each feature separated by "," so we use as argument the specific separator ",". The file does not have header so we also specify it.
 dataframe <- read.table("wdbc.data", header = FALSE, sep=",")
@@ -135,6 +135,30 @@ datos
 #discomment in case the file with the preprocessed dataframe is needed.
 #write.table(datos, file = 'dataframe.csv', sep = ',', row.names = FALSE)
 ```
+
+### 1.3 Data Base description
+
+The file *wdbc.data* contains data collected from 569 patients based on 10 different indicators of breast cancer. We have 3 different measures for each indicator, each one corresponding to a spacial dimensions (XYZ axis):
+
+-   Radius (mean of distances from center to points on the perimeter).
+
+-   Texture (standard deviation of gray-scale values).
+
+-   Perimeter.
+
+-   Area.
+
+-   Smoothness (local variation in radius lengths).
+
+-   Compactness ($\frac{perimeter^2}{area - 1.0}$).
+
+-   Concavity (severity of concave portions on the contour).
+
+-   Concave points (number of concave portions of the contour).
+
+-   Symmetry.
+
+-   Fractal dimension ("coastline approximation" - 1).
 
 ## 2. Univariate Exploratory Analysis
 
@@ -203,15 +227,15 @@ Next, we will plot some interesting graphs of each feature, such as density func
 for(col in names(datos)[-1]) {
 
   # creating density, histogram and boxplot
-  p1 <- ggplot(datos, aes_string(x = col)) + geom_density() +
+  p1 <- ggplot(datos[-1], aes_string(x = col)) + geom_density() +
     labs(title = paste("Density function of", col), x = col, y = "Values") +
     theme(plot.title = element_text(size = 8, hjust = 0.5))
   
-  p2 <- ggplot(datos, aes_string(x = col)) + geom_histogram(bins = 30) +
+  p2 <- ggplot(datos[-1], aes_string(x = col)) + geom_histogram(bins = 30) +
     labs(title = paste("Histogram of", col), x = col, y = "Values") +
     theme(plot.title = element_text(size = 8, hjust = 0.5))
   
-  p3 <- ggplot(datos, aes_string(x = col)) +
+  p3 <- ggplot(datos[-1], aes_string(x = col)) +
     geom_boxplot(outlier.colour = "red", outlier.shape = 1, outlier.size = 2) +
     coord_flip() + labs(title = paste("Boxplot of", col), x = "Values", y = "") +
     theme(plot.title = element_text(size = 8, hjust = 0.5))
@@ -309,6 +333,8 @@ reemplazar_outliers <- function(x) {
   return(x)
 }
 
+
+
 # we apply the function to every feature of our dataset
 datos_preprocessed <- datos %>% mutate(across(-1, reemplazar_outliers))
 
@@ -316,7 +342,8 @@ datos_preprocessed <- datos %>% mutate(across(-1, reemplazar_outliers))
 ```
 
 ```{r}
-datos_preprocessed = datos
+# Uncomment to undo the outliers treatment
+# datos_preprocessed = datos
 ```
 
 We have created a function that erase the outliers, just taking in count the quantiles of each feature and leaving the values which are not considered as outliers.
@@ -402,15 +429,130 @@ Looking on the results obtained we can see that despite we obtained in the graph
 
 ## 3. Multivariate Exploratory Analysis
 
-### 3.1
+### 3.1 Correlation
 
-### 3.2
+Firstly, it is necessary to check if the variables are or not independent. We could do it observing the correlation matrix, at sample level. At population level, we could check if there is correlation using Bartlett's Test (this test is used to test the null hypothesis, $H_0$ that all $k$ population variances are equal against the alternative that at least two are different).
 
-### 3.3
+```{r}
+###############################
+# Correlation at sample level #
+###############################
 
-### 3.4
+# Are the variables correlated at sample level?
+correlation_matrix<-cor(datos_preprocessed[-1])
+correlation_matrix
+```
 
-### 3.5
+```{r}
+det(correlation_matrix)
+```
+
+It is noticed an important correlation between some variables. For example, we can see it between perimeter1 and area:
+
+```{r}
+cor(datos_preprocessed$perimeter1, datos_preprocessed$area1)
+```
+
+Let's study correlation at population level
+
+```{r}
+###################################
+# Correlation at population level #
+###################################
+
+# Bartlett's sphericity test:
+# This test checks wheter the correlations are significantly different from 0
+# The null hypothesis is H_0; det(R)=1 means the variables are uncorrelated
+# R denotes the correlation matrix
+# cortest.bartlett function in the package pysch performs this test
+# This function works with standarized data
+
+#Standardization
+datos_preprocessed_scale<-scale(datos_preprocessed[-1])
+
+# Bartlett's sphericity test
+cortest.bartlett(cor(datos_preprocessed_scale), 569) # 569 is the sample size
+```
+
+Due to $p-value$ is 0\<0.001, we can assume that there is no independence, so it is logical to propose dimension's reduction trough a Principal Component Analysis or Factorial Analysis.
+
+### 3.2 Principal Components Analysis (PCA)  
+
+The following code performs the PCA, obtaining the eigenvectors of each component and them eigenvalues (variance of each one).
+
+```{r}
+# The 'prcomp' function in the base R package performs this analysis
+# Parameters 'scale' and 'center' are set to TRUE to consider standardized data
+PCA<-prcomp(datos_preprocessed[-1], scale=T, center=T)
+
+# The field 'rotation0 of the 'PCA' object is a matrix
+# Its columns are the coefficients of the principal components
+# Indicates the weight of each variable in the corresponding principal component
+PCA$rotation
+```
+
+At field "sdev" PCA object we can find standard deviations of each principal component. With summary function applied to PCA object, we obtain some interesting measures:
+
+```{r}
+PCA$sdev
+```
+
+```{r}
+summary(PCA)
+```
+
+The following graph shows the proportion of explained variance
+
+```{r}
+explained_variance<-PCA$sdev^2 / sum(PCA$sdev^2)
+
+p1<-ggplot(data=data.frame(explained_variance, pc=1:ncol(datos_preprocessed[-1])), 
+           aes(x= pc, y = explained_variance, fill=explained_variance)) + geom_col(width = 0.3) +
+           scale_y_continuous(limits = c(0,0.6)) + theme_bw() + labs(x = "Principal component", y = "Proportion of variance")
+
+p1
+```
+
+The following graph shows the proportion of cumulative explained variance
+
+```{r}
+cummulative_variance<-cumsum(explained_variance)
+
+p2<-ggplot(data = data.frame(cummulative_variance, pc= 1:ncol(datos_preprocessed[-1])), aes(x = pc, y = cummulative_variance, fill=cummulative_variance)) + geom_col(width = 0.5) + scale_y_continuous(limits = c(0,1)) + theme_bw() + labs(x = "Principal component", y = "Proportion of cumulative variance")
+
+p2
+```
+
+### 3.3 Appropriate number of principal components
+
+There are different methods to carry out this process, but we will use Rule of Abdi et al. (2010): The variances explained by the principal components are averaged and those whose proportion of explained variance exceeds the mean are selected.
+
+```{r}
+PCA$sdev^2
+```
+
+```{r}
+mean(PCA$sdev^2)
+```
+
+```{r}
+counter<-1
+print("Prinicipal components considered:")
+for(element in PCA$sdev^2){
+  if(element > mean(PCA$sdev^2)){
+    print(colnames(PCA$x)[counter])
+  }
+  counter<- counter + 1
+}
+```
+
+So, we would only consider the first 6th components. They accumulate near to 82% of the explained variance. Each principal component is obtained as linear combination of all components with the coefficients indicated at the columns of rotation matrix.
+
+There is the possibility of representing different pairwise comparisons between the principal components, but since we have 6 principal components, we would have to create $\frac{6!}{2} = 360$ graphs, which is impractical.
+
+```{r}
+
+```
 
 ### 3.6 Multivariate Normality of the data
 
