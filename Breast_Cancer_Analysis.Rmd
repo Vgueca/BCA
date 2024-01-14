@@ -20,6 +20,23 @@ Along this Rnotebook we will analyze the features obtained from the [Breast Canc
 #install.packages("tidyverse")
 #install.packages("pastecs")
 
+# Julián' problems: I had to run these commands on my ubuntu terminal and also install additional packages to make the doc works.
+  # sudo apt-get install r-base-dev libcurl4-openssl-dev libxml2-dev libssl-dev libmagick++-6.q16-dev
+  # sudo apt-get install libharfbuzz-dev
+  # sudo apt-get install libfribidi-dev
+  #
+  #install.packages("ggpubr")
+  #install.packages("biotools")
+  #install.packages("caret")
+  #install.packages("klaR")
+  # and others... (i chose an option to install all dependencies automatically)
+  
+  # Also i had to install GSL and gsl package to install and use MNV library:
+  # sudo apt-get install libgsl-dev
+  #install.packages("mnv")
+
+
+
 # Package required to call 'freq' and 'descr' functions (descriptive statistics)
 library(summarytools)
 
@@ -68,9 +85,6 @@ library(scatterplot3d)
 # Package required to call 'factanal' function
 library(stats)
 
-# Package required to call 'freq' function
-library(summarytools)
-
 # Package required to call 'cortest.bartlett' function
 library(psych)
 
@@ -86,12 +100,19 @@ library(corrplot)
 # Package required to call 'rplot' function
 library(corrr)
 
-#  Package required to call 'ggplot' function
-library(ggplot2)
-library(ggpubr)
-
-
 library(tidyverse)
+
+# Package required to call 'partimat' function
+library(klaR)
+
+# Package required to call 'clusGap' function
+library(cluster)
+
+# Package required to call 'ggdendrogram' function
+library(ggdendro)
+
+# Package required to call 'grid.arrange' function
+library(gridExtra)
 
 ```
 
@@ -105,7 +126,11 @@ library(tidyverse)
 #setwd("C:/Users/valentin/Desktop/DGIIM 5/1 CUATRI/MULTIVARIANTE/PRACTICAS/PRACTICA_FINAL/Breast_Cancer_Analysis")
 
 #Javi's path
-setwd("/home/javi5454/Desktop/Github/Breast_Cancer_Analysis")
+#setwd("/home/javi5454/Desktop/Github/Breast_Cancer_Analysis")
+
+#Julián's path
+getwd()
+setwd("/home/julian/Escritorio/5_DGIIM/Est_Mult/PRACTICAS/P_FINAL/Breast_Cancer_Analysis")
 
 #loading data. We haven seen that the file has the values of each feature separated by "," so we use as argument the specific separator ",". The file does not have header so we also specify it.
 dataframe <- read.table("wdbc.data", header = FALSE, sep=",")
@@ -187,8 +212,8 @@ Regarding the types of values we have on the dataset and the range of the domain
 Another key part of the Univariate Exploratory Analysis is to identify missing values. On the following cells we are going to compute the porcentage of missing values of each feature. ![]()
 
 ```{r}
-# compute the missing values for each feature of our dataset
-missing_values <- sapply(datos, function(x) sum(is.na(x))/length(x) * 100)
+# compute the missing values for each feature of our dataset (We don't have to do this because our dataset doesn't have missing values)
+# missing_values <- sapply(datos, function(x) sum(is.na(x))/length(x) * 100)
 
 # we plot the results of the missing values data 
 barplot(missing_values, main = "Porcentage of missing values", xlab = "", ylab = "Porcentage of missing values", col = "steelblue", las = 2, ylim = c(0, 100))
@@ -717,4 +742,466 @@ royston_test$multivariateNormality
 ```{r}
 hz_test <- mvn(data = datos_preprocessed[,-1], mvnTest = "hz")
 hz_test$multivariateNormality
+```
+
+## **4.Linear Discriminant Analysis (LDA)**
+
+```{r}
+#We create a new variable that includes the dataframe with our ID system and also the categorical variable "DIAGNOSIS" which one wasn't used before and therefore erased in "datos" variable
+datos2 <- dataframe[-1]
+datos2$ID <- 1:nrow(datos2)
+datos2 <- datos2[, c('ID', names(datos2)[-ncol(datos2)])]
+datos2
+```
+
+Considering now this qualitative variable "DIAGNOSIS", it is interesting to build a classifier to distinct between its two categories: 
+  - M: Denotes "Malignant" 
+  - B: Denotes "Benign"
+In order to to classify cancer impact and patients' health. So Diagnosis would be or response variable and the other ones except ID would be the explanatory variables.
+```{r}
+# The response variable has to be an object of the class 'factor' of R language
+datos2$DIAGNOSIS<-as.factor(datos2$DIAGNOSIS)
+```
+### 4.1 Graphical exploration of data
+
+First, we explore how well (or poorly) each of the explanatory variables considered independently classifies the Diagnosis.
+```{r}
+diagnosis <- datos2$DIAGNOSIS
+
+# Create a list to store the graphics
+g_list <- list()
+
+# Names of the columns we want to graph
+explanatory <- names(datos2[, -c(1, 2)])
+
+# For loop to create the graphics and store them in the list
+for (col in explanatory) {
+  plot <- ggplot(data = datos2[-1], aes_string(x = col, fill = diagnosis)) +
+          geom_histogram(position = "identity", alpha = 0.5)
+  
+  print(plot)
+  #g_list[[paste0("p", length(g_list) + 1)]] <- plot
+}
+#ggarrange(plotlist=g_list, nrow = length(g_list), common.legend = TRUE)
+# ggarrange(g_list[[1]], g_list[[2]], g_list[[3]], #g_list[[4]], g_list[[5]], g_list[[6]], g_list[[7]], g_list[[8]], g_list[[9]], g_list[[10]],
+#           #g_list[[11]], g_list[[12]], g_list[[13]], g_list[[14]], g_list[[15]], g_list[[16]], g_list[[17]], g_list[[18]], g_list[[19]], g_list[[20]],
+#           #g_list[[21]], g_list[[22]], g_list[[23]], g_list[[24]], g_list[[25]], g_list[[26]], g_list[[27]], g_list[[28]], g_list[[29]], g_list[[30]],
+#           nrow=3, common.legend = TRUE)
+```
+
+# ```{r}
+# ggarrange(g_list[[1]], g_list[[2]], g_list[[3]], nrow=3, common.legend = TRUE)
+# ```
+# ```{r}
+# ggarrange(g_list[[4]], g_list[[5]], g_list[[6]], nrow=3, common.legend = TRUE)
+# ```
+# ```{r}
+# ggarrange(g_list[[7]], g_list[[8]], g_list[[9]], nrow=3, common.legend = TRUE)
+# ```
+# ```{r}
+# ggarrange(g_list[[10]], g_list[[11]], g_list[[12]], nrow=3, common.legend = TRUE)
+# ```
+# ```{r}
+# ggarrange(g_list[[13]], g_list[[14]], g_list[[15]], nrow=3, common.legend = TRUE)
+# ```
+# ```{r}
+# ggarrange( g_list[[16]], g_list[[17]], g_list[[18]], nrow=3, common.legend = TRUE,heights = c(5,5,5))
+# ```
+# ```{r}
+# ggarrange(g_list[[19]], g_list[[20]], g_list[[21]], nrow=3, common.legend = TRUE)
+# ```
+# ```{r}
+# ggarrange(g_list[[22]], g_list[[23]], g_list[[24]], nrow=3, common.legend = TRUE)
+# ```
+# ```{r}
+# ggarrange(g_list[[25]],g_list[[26]], g_list[[27]], nrow=3, common.legend = TRUE)
+# ```
+# ```{r}
+# ggarrange(g_list[[28]], g_list[[29]], g_list[[30]], nrow=3, common.legend = TRUE)
+#```
+
+We could see that area1, concave_points1, radius3, area3, perimeter3 and concave_points3 are the best options to differentiate between benign and malignant.
+Next, we could think about exploring which pairs of variables best separate between diagnosis but due to the high number of explanatory variables we have, this technique would generate too many combinations and that's not worthy. However, we add the commented code to give the possibility of visualizing graphics of pairs of variables for each axis (variables grouped 10 by 10).
+```{r}
+# exp1<-explanatory[1:10]
+# exp2<-explanatory[11:20]
+# exp3<-explanatory[21:30]
+# 
+# # Margins adjust
+# par(mar = c(0.1, 0.1, 0.1, 0.1))
+# 
+# # Create a vector for different points representations
+# pch_vector <- ifelse(datos2$DIAGNOSIS == "M", 4, 1)  # Usar pch = 4 para Diagnosis M, pch = 1 para Diagnosis B
+# 
+# # Create pairs graphic -> Change exp"number" to visualize the different groups of variables
+# pairs(x = (datos2[-1])[, exp1], col = c("orange", "blue")[datos2$DIAGNOSIS], pch = pch_vector)
+# 
+# # Adding the legend - (not working)
+# #legend("topright", legend = unique(datos2$DIAGNOSIS), col = c("blue", "orange"), pch = c(4, 1), title = "Diagnosis")
+# # text(1, 2, "A", col = "blue", pos = 4)
+# # text(1, 1.8, "B", col = "orange", pos = 4)
+```
+We have the same problem, even bigger, if we try to do this visual analysis with groups of three variables.
+
+### 4.2) Univariate and multivariate normality
+Next we make a graphical exploration of the normality of the univariate distributions but considering now the diagnosis category. 
+```{r}
+datos3<-datos2[-1]
+datos3
+
+# Histogram representation of each variable for each diagnosis
+par(mfcol = c(2, 3))
+for (k in 2:31) {
+  j0 <- names(datos3)[k]
+  x0 <- seq(min(datos3[, k]), max(datos3[, k]), le = 50)
+  for (i in 1:2) {
+    i0 <- levels(datos3$DIAGNOSIS)[i]
+    x <- datos3[datos3$DIAGNOSIS == i0, j0]
+    hist(x, proba = T, col = grey(0.8), main = paste("Diagnosis", i0), xlab = j0)
+    lines(x0, dnorm(x0, mean(x), sd(x)), col = "blue", lwd = 2)
+  }
+}
+
+```
+
+```{r}
+# Representation of normal quantiles of each variable for each species
+par(mfrow=c(2,3))
+for (k in 2:31) {
+  j0 <- names(datos3)[k]
+  x0 <- seq(min(datos3[, k]), max(datos3[, k]), le = 50)
+  for (i in 1:2) {
+    i0 <- levels(datos3$DIAGNOSIS)[i]
+    x <- datos3[datos3$DIAGNOSIS == i0, j0]
+    qqnorm(x, main = paste("Diagnosis", i0, j0), pch = 19, col = i + 1)
+    qqline(x)
+  }
+}
+```
+We could think that just a few of the variables in axis x and z follow a normal univariate distribution determined by their diagnosis. But then, for greater and numerical certainty, we do the respective normality tests.
+
+```{r}
+datos_tidy <- melt(datos3, value.name = "value")
+
+results <- aggregate(formula = value ~ DIAGNOSIS + variable, data = datos_tidy, FUN = function(x){shapiro.test(x)$p.value})
+
+results <- results[, c(2, 1, 3)]
+
+# new column to find if the value obtained is greater than the p-value
+results$NORMALITY <- ifelse(resultados$value < 0.05, "NO", "YES")
+
+#Print results
+print(results)
+```
+
+There's a high lack of univariate normality as we could imagine because of the previous results in section 2.5. There's a lack of multivariate normality aswell as we proved before in section 3.6. Therefore, the final phase of the analysis and linear model results are not well supported and also not reliable.
+
+### 4.3) Homogeneity of variance
+
+When multiple predictors are used, it must be verified that the covariance matrix is constant in all groups. In this case it is also advisable to check the homogeneity of the variance for each predictor at the individual level. So we apply now the most recommended test that is the Box M test, which is an extension of the Barttlet test for multivariate scenarios. 
+It must be taken into account that it is very sensitive to whether the data are actually distributed according to a multivariate normal. For this reason, it is recommended to use a significance (p-value) <0.001 to reject the null hypothesis. However, the lack of MND let us think that this test won't provide useful information for the later model.
+
+```{r}
+boxM(data = datos3[, c(2:31)], grouping = datos3$DIAGNOSIS)
+```
+As we expected we reject the null hypothesis since p-value is practically zero and therefore we cannot assume homogeneity of variances. Also it is important to remember that for this conclusion to be reliable the assumption of multivariate normality must be met, which, in this case, that's not the case. We knew in advance that the results won't be positive and not even reliable.
+
+### 4.4) Discriminat function
+
+At this point our data do not satisfy the assumptions needed (multivariate normality and homogeneity of variance) so there wouldn't be recommendable continuing forward with the linear discriminant classification model. However, once again, we keep here the code to exemplify how it would be done.
+
+```{r}
+modelo_lda <- lda(formula = diagnosis ~ radius1 + texture1 + perimeter1 + area1 + smoothness1 + compactness1 + concavity1 + concave_points1 + symmetry1 + fractal_dimension1 +
+                                         radius2 + texture2 + perimeter2 + area2 + smoothness2 + compactness2 + concavity2 + concave_points2 + symmetry2 + fractal_dimension2 +
+                                         radius3 + texture3 + perimeter3 + area3 + smoothness3 + compactness3 + concavity3 + concave_points3 + symmetry3 + fractal_dimension3 ,
+                  data = datos2)
+modelo_lda
+```
+The output of this object shows us the prior probabilities of each group, in this case 0.6274165 for benign and 0.3725835 for malignant, the means of each regressor per group and the coefficients of the linear discriminant classification model.
+Now we are able to classify new data based on its measurements by simply calling the predict function.
+
+```{r}
+#datos2
+nuevas_observaciones <- data.frame(radius1 = 17.990, texture1 = 17.77, perimeter1 = 130.00, area1= 1203.0, smoothness1 = 0.09463, compactness1 = 0.23960, concavity1 = 0.1127000, concave_points1 = 0.080890, symmetry1 = 0.2087, fractal_dimension1 = 0.05742, radius2 = 0.5435, texture2 = 0.7813, perimeter2 = 3.3980, area2 = 24.320, smoothness2 = 0.006399, compactness2 = 0.024610, concavity2 = 0.0225400, concave_points2 = 0.014320, symmetry2 = 0.013890, fractal_dimension2 = 0.0045710, radius3 = 14.910, texture3 = 16.67, perimeter3 = 103.40	, area3 = 1606.0, smoothness3 = 0.16540, compactness3 = 0.54010, concavity3 = 1.105000, concave_points3 = 0.206000, symmetry3 = 0.4601, fractal_dimension3 = 0.07678)
+predict(object = modelo_lda, newdata = nuevas_observaciones)
+```
+I pick only values from the first 10 rows, all classified as M (malignant) but the classifier output is class B (benign).
+
+### 4.5) Model validation
+We divide the original dataset into two subsets: the first, known as training set, with approximately 80% of the records, which will be used to fit a new model but always lineal one (model_lda_1 instead of model_lda); and the second, known as test set, with 20% of the remaining records, which will be used for cross-validation.
+We use a new model to make the distinction between training and test datasets.
+
+```{r}
+set.seed(123)  # Set seed for reproducibility
+
+# Number of total rows in the dataset
+total_rows <- nrow(datos2)
+
+# Number of rows for training (80%)
+num_training <- round(0.8 * total_rows)
+
+# Indices of rows for training (random)
+indices_training <- sample(1:total_rows, num_training, replace = FALSE)
+
+# Training set
+training_set <- datos2[indices_training, ]
+
+# Test set (using the remaining rows)
+test_set <- datos2[-indices_training, ]
+
+# Print information about the split
+cat("Rows in the training set:", nrow(training_set), "\n")
+cat("Rows in the test set:", nrow(test_set), "\n")
+```
+
+We visualize first the confusion matrix for the training set:
+
+```{r}
+# Dividing training vs. test set
+diagnosis_training <- diagnosis[indices_training]
+diagnosis_test <- diagnosis[-indices_training]
+
+# Training LDA model
+modelo_lda_1 <- lda(formula = diagnosis_training ~ radius1 + texture1 + perimeter1 + area1 + smoothness1 + compactness1 + concavity1 + concave_points1 + symmetry1 + fractal_dimension1 +
+                                        radius2 + texture2 + perimeter2 + area2 + smoothness2 + compactness2 + concavity2 + concave_points2 + symmetry2 + fractal_dimension2 +
+                                        radius3 + texture3 + perimeter3 + area3 + smoothness3 + compactness3 + concavity3 + concave_points3 + symmetry3 + fractal_dimension3 ,
+                  data = training_set)
+
+pred <- predict(modelo_lda_1, dimen = 1)
+confusionmatrix(training_set$DIAGNOSIS, pred$class)
+```
+Confusion matrix for the training set.
+```{r}
+# Classification error percentage
+trainig_error <- mean(training_set$DIAGNOSIS != pred$class) * 100
+paste("trainig_error=", trainig_error, "%")
+```
+We visualize now the training set classification error percentage but we are interested in the test set error because it is where the validation is usually done. 
+```{r}
+# Predictions on the test set
+pred_test <- predict(modelo_lda_1, newdata = test_set, dimen = 1)
+
+# Confusion matrix for the test set
+confusion_matrix_test <- table(test_set$DIAGNOSIS, pred_test$class)
+print(confusion_matrix_test)
+```
+Confusion matrix for the test set.
+```{r}
+# Classification error percentage for the test set
+test_error <- mean(test_set$DIAGNOSIS != pred_test$class) * 100
+paste("test_error =", test_error, "%")
+```
+In this case the correct classifications rate is 95.61% aprox. It seems like a good result but in terms of cancer diagnosis maybe it is not enough (We are not medical experts to judge that).
+
+### 4.6) Displaying rankings
+We try to display an example considering all the dataset
+```{r}
+partimat(DIAGNOSIS ~  radius1 + texture1 + perimeter1 + area1 + smoothness1 + compactness1 + concavity1 + concave_points1 + symmetry1 + fractal_dimension1 ,
+         data = datos2[-1], method = "lda", prec = 200,
+         image.colors = c("green", "orange"),
+         col.mean = "yellow",nplots.vert =1, nplots.hor=3)
+```
+We could see how chaotic the results are if we make with all the dataset instead of only the test-set. 
+Now we display some examples with the first axis variables and the test set without the intention of obtaining good results.
+```{r}
+partimat(diagnosis_test ~  radius1 + texture1 + perimeter1 + area1 + smoothness1 + compactness1 + concavity1 + concave_points1 + symmetry1 + fractal_dimension1 ,
+         data = test_set, method = "lda", prec = 200,
+         image.colors = c("green", "orange"),
+         col.mean = "yellow",nplots.vert =1, nplots.hor=3)
+```
+In case of using the test set, we could visualize better the points.
+Results: Every classification has at least an error of 10% more or less, few of then even up to 30% or very close to it. So they're not good models. 
+
+Let's try with radius1, area1, concave_points1, radius3, area3, perimeter3 and concave_points3. Variables that seemed before they were good individual options to build the classifier.
+Let see how "they work in pairs" cosidering again all the dataset.
+```{r}
+partimat(DIAGNOSIS ~ radius1 + area1 + concave_points1 + radius3 + area3 + perimeter3 + concave_points3 ,
+         data = datos2[-1], method = "lda", prec = 200,
+         image.colors = c("green", "orange"),
+         col.mean = "yellow",nplots.vert =1, nplots.hor=3)
+```
+The classifiers built with 3 type variables (axis z variables) have a bit lower error, specially the last three classifiers (concave_points3 with radius3, area3 and perimeter3). They have an error equal to 6%. The best pairs-classifiers obtained until now. So if a classification model were made with two predictors, this pair would be considered.
+
+## **5. Quadratic Discriminant Analysis (QDA)**
+
+As for the Linear Discriminant Analysis, to carry out the Quadratic Discriminant Analysis we should begin with the graphical exploration of the data and the checks about the hypothesis on univariate and multivariate normality and homogeneity of the variances, which have already been previously done. Then we now that there's not assumption of MNV, nevertheless the quadratic discriminant analysis has a certain robustness in this case. Also there's NO homogeneity of variances.
+
+
+### 5.1 Discriminant Function
+Although the assumption of multivariate normality is not verified, taking into account that the variances are not homogeneous, a quadratic discriminant model is adjusted because it is robust against the lack of this assumption, although it must be kept in mind given the possibility of obtaining unexpected results.
+
+```{r}
+#quadratic model
+modelo_qda <- qda(diagnosis_training ~ radius1 + texture1 + perimeter1 + area1 + smoothness1 + compactness1 + concavity1 + concave_points1 + symmetry1 + fractal_dimension1 +
+                               radius2 + texture2 + perimeter2 + area2 + smoothness2 + compactness2 + concavity2 + concave_points2 + symmetry2 + fractal_dimension2 +
+                               radius3 + texture3 + perimeter3 + area3 + smoothness3 + compactness3 + concavity3 + concave_points3 + symmetry3 + fractal_dimension3, 
+                  data = training_set)
+modelo_qda
+```
+The output of this object shows us the prior probabilities of each group. Now they are a bit different from those ones obtained in model_lda because in this case we are using just the training set data instead of all the dataset. It also shows the means of each regressor per group.
+
+Once the classifier is built, we can classify new data based on its measurements by simply calling the predict function. We classify all the observations in the test set.
+```{r}
+nuevas_observaciones <- test_set
+predict(object = modelo_qda, newdata = nuevas_observaciones)
+```
+
+### 5.2 Model validation
+```{r}
+# Confusion matrix
+pred <- predict(object = modelo_qda, newdata = test_set)
+confusionmatrix(test_set$DIAGNOSIS, pred$class)
+```
+
+```{r}
+# Classification error percentage
+test_error <- mean(test_set$DIAGNOSIS != pred$class) * 100
+paste("test_error=", test_error, "%")
+```
+In this case the correct classifications rate is 93.86%.
+
+### 5.3 Displaying rankings
+Analogous to LDA part, we display some graphics to check quadratic classifiers grouping variables by pairs. Always considering tghe testset data.
+
+Example with axis x variables:
+```{r}
+partimat(formula = diagnosis_test ~ radius1 + texture1 + perimeter1 + area1 + smoothness1 + compactness1 + concavity1 + concave_points1 + symmetry1 + fractal_dimension1,
+                                    #radius2 + texture2 + perimeter2 + area2 + smoothness2 + compactness2 + concavity2 + concave_points2 + symmetry2 + fractal_dimension2 +
+                                    #radius3 + texture3 + perimeter3 + area3 + smoothness3 + compactness3 + concavity3 + concave_points3 + symmetry3 + fractal_dimension3,
+         data = test_set, method = "qda", prec = 400,
+         image.colors = c("skyblue2", "darkgoldenrod1"),
+         col.mean = "green", nplots.vert =1, nplots.hor=3)
+```
+Results with best individual variables considered:
+```{r}
+partimat(formula = diagnosis_test ~ radius1 + area1 + concave_points1 + radius3 + area3 + perimeter3 + concave_points3,
+         data = test_set, method = "qda", prec = 400,
+         image.colors = c("skyblue2", "darkgoldenrod1"),
+         col.mean = "green", nplots.vert =1, nplots.hor=3)
+```
+
+We try now considering all the dataset:
+```{r}
+partimat(formula = DIAGNOSIS ~ radius1 + area1 + concave_points1 + radius3 + area3 + perimeter3 + concave_points3,
+         data = datos2[-1], method = "qda", prec = 400,
+         image.colors = c("skyblue2", "darkgoldenrod1"),
+         col.mean = "green", nplots.vert =1, nplots.hor=3)
+```
+Similar to LDA case, the best classification of the data is the one given by the predictors radius3 and concave_points3 but now with more accuracy (particular and general case).
+Then we could confirm that with a large number of training observations available, QDA is more appropriate than LDA (also in our case we couldn't rely on LDA results).
+
+
+## **6. Cluster Analysis**
+Additionally, we are performing a cluster analysis to confirm that the grouping of the response variable used in the classification models (DIAGNOSIS) is appropriate.
+
+### 6.1 Data Preparation
+To perform a cluster analysis with R, the data must be prepared as follows:
+  1 • Ensure that the rows are records of observations and that the columns are the variables of interest (data.frame type structure).
+  2 • The missing values must be adequately treated (eliminate or replace their value).
+  3 • It must be decided whether to work with standardized data to make variables measured on different scales comparable.
+  
+In our case: datos2[-2] verifies 1), there's no missing values in our dataset so we also verifies 2)
+
+```{r}
+# Print our dataset without the 2 first columns which are not of interest in cluster analysis (in fact, column 2 is what we want to determine with this CA and column 1 is for IDs).
+datos_cluster <- datos2[, -c(1, 2)]
+head(datos_cluster)
+```
+
+We check means and standard deviations to establish if the data are standardized:
+```{r}
+columnas <- colnames(datos_cluster)
+medias <- list()
+sd <- list()
+
+for (col in columnas){
+  medias <- c(medias, mean(datos_cluster[[col]], na.rm = TRUE))
+  sd <- c(sd, sd(datos_cluster[[col]], na.rm = TRUE))
+}
+print(paste("Medias:", paste(medias, collapse = ", ")))
+```
+
+```{r}
+print(paste("Desviaciones estándar:", paste(sd, collapse = ", ")))
+
+```
+
+Our data are not standardized because they doo't have a mean of 0 and a standard deviation of 1, so 3) is not verified and we correct it:
+```{r}
+# To prevent the cluster analysis from being influenced by any arbitrary variable, the data are standard
+datos_cluster<-as.data.frame(scale(datos_cluster))
+# Visualization of standardized data
+head(datos_cluster)
+```
+
+Now our data are prepared for CA.
+
+### 6.2 Distance Information
+To classify observations into groups it is necessary to choose appropriate measures of similarity, or distance (dissimilarity), that provide information on how similar any two observations are. Almost all the usual software for cluster analysis uses the Euclidean distance so we opt for using this one as R default option.
+
+The following distance matrix shows in brown those states that present large dissimilarities (distances), compared to those that seem closer in yellow. The color white is used to refer to those states with distances that are not so extreme as to be considered low or high.
+```{r}
+distance<- get_dist(datos_cluster)
+fviz_dist(distance, gradient = list(low ="yellow", mid = "white", high = "brown"))
+```
+### 6.3 Hierarchical clustering: Ward’s method
+Hierarchical clustering is interested in finding a hierarchy based on the closeness or similarity of the data according to the distance considered. In the agglomerative case, we start from a group with the closest observations. The next closest pairs are then calculated and groups are generated in an ascending manner.
+This construction can be observed visually by means of a dendrogram and the selection of the optimal number of groups can be also estimated from this same graph.
+```{r}
+dendrogram <- hclust(dist(datos_cluster, method = 'euclidean'), method = 'ward.D')
+ggdendrogram(dendrogram, rotate = FALSE, labels = FALSE, theme_dendro = TRUE) +
+labs(title = "Dendrograma")
+```
+On the horizontal axis of the dendrogram we have each of the data that make up the input set, while on the vertical axis the Euclidean distance that exists between each group is represented, as that these are becoming hierarchical.
+Each vertical line in the diagram represents a grouping. (UP -> less groups / DOWN -> more groups)
+
+One way to determine the appropriate K number of groups is to cut the dendrogram at that height of the diagram that best represents the input data. However, we are going to explore other options.
+
+### 6.4 Determination of the optimal number of clusters
+
+Below are three of the most used methods to determine this optimal number of groups: Elbow method, Silhouette method and the Gap statistic. Let's see if they match.
+
+```{r}
+#Elbow method
+set.seed(123)
+fviz_nbclust(datos_cluster, kmeans, method = "wss")
+```
+We could appreciate the "elbow" for the number of 2 clusters.
+```{r}
+#Silhouette Method
+set.seed(123)
+fviz_nbclust(datos_cluster, kmeans, method = "silhouette")
+```
+
+```{r}
+#Gap Statistical Method
+set.seed(123)
+gap_stat <- clusGap(datos_cluster, FUN = kmeans, nstart = 25,K.max = 10, B = 50)
+fviz_gap_stat(gap_stat)
+```
+### 6.5 Analysis of results
+After the detailed analysis of the optimal number of clusters, carried out in the previous section, K=2 seems to be the most appropriate number of groups for this analysis.
+It matches with our original dataset which classifies data into 2 groups, M and B.
+
+Finally, when we know the optimal number of clusters, we use non-hierarchical clustering through the K-means algorithm to classify data into this 2 groups and also get more cluster analysis information. 
+We use then K-means function.
+```{r}
+set.seed(123)
+k2 <- kmeans(datos_cluster, 2, nstart = 25)
+
+# Displaying all the fields of the object k2
+str(k2)
+```
+
+A visual way to summarize the results elegantly and with straightforward interpretation is by using the fviz_cluster function.
+```{r}
+set.seed(123)
+fviz_cluster(k2,data=datos_cluster)
+```
+The last thing, like an interesting point, is that it is possible to extract the clusters and add them to our initial data to provide some cluster-level descriptive statistics. We already have this information in our original dataset but we show how it works.
+```{r}
+datos_cluster %>%
+mutate(Cluster = k2$cluster) %>%
+group_by(Cluster) %>%
+summarise_all("mean")
 ```
