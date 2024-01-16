@@ -1,6 +1,13 @@
+---
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
 # BREAST CANCER ANALYSIS
 
-Along this Rnotebook we will analyze the features obtained from the [Breast Cancer's Dataset](https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic). We will apply the methods and techniques seen during the course of Multivariate Statistics of the University of Granada.
+Along this Rnotebook we will analyze the features obtained from the [Breast Cancer's Dataset](https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic).
+We will apply the methods and techniques seen during the course of Multivariate Statistics of the University of Granada.
 
 ## **1. Loading packages and data sets**
 
@@ -169,7 +176,8 @@ datos
 
 ### 1.3 Data Base description
 
-The file *wdbc.data* contains data collected from 569 patients based on 10 different indicators of breast cancer. We have 3 different measures for each indicator, each one corresponding to a spacial dimensions (XYZ axis):
+The file *wdbc.data* contains data collected from 569 patients based on 10 different indicators of breast cancer.
+We have 3 different measures for each indicator, each one corresponding to a spacial dimensions (XYZ axis):
 
 -   Radius (mean of distances from center to points on the perimeter).
 
@@ -195,11 +203,15 @@ The file *wdbc.data* contains data collected from 569 patients based on 10 diffe
 
 Firstly, we would like to give an brief description of the data, to be more aware of what types of data we are working on.
 
-The public dataset we are working on is related to the Breast Cancer. All the values given are computed from digitized images of a fine needle aspirate (FNA) of a breast mass. They describe **characteristics of the cell nucleus**.
+The public dataset we are working on is related to the Breast Cancer.
+All the values given are computed from digitized images of a fine needle aspirate (FNA) of a breast mass.
+They describe **characteristics of the cell nucleus**.
 
-The dataframe consists on 30 continuous and numeric features (plus the ID and Target one). Each feature is actually a real-value computed for each cell nucleus.
+The dataframe consists on 30 continuous and numeric features (plus the ID and Target one).
+Each feature is actually a real-value computed for each cell nucleus.
 
-In our opinion, we belief that this dataset is clearly a dataset to perform Machine Learning, as they even included one Target feature. The features are intuitive and the idea behind the dataset is also clear and concise; predict the type of Breast Cancer (malignant or bening).
+In our opinion, we belief that this dataset is clearly a dataset to perform Machine Learning, as they even included one Target feature.
+The features are intuitive and the idea behind the dataset is also clear and concise; predict the type of Breast Cancer (malignant or bening).
 
 So, after this quick analysis of the dataset we can start to perform the Univariate Exploratory Analysis.
 
@@ -209,11 +221,13 @@ Regarding the types of values we have on the dataset and the range of the domain
 
 ### 2.2 Missing values
 
-Another key part of the Univariate Exploratory Analysis is to identify missing values. On the following cells we are going to compute the porcentage of missing values of each feature. ![]()
+Another key part of the Univariate Exploratory Analysis is to identify missing values.
+On the following cells we are going to compute the porcentage of missing values of each feature.
+![]()
 
 ```{r}
 # compute the missing values for each feature of our dataset (We don't have to do this because our dataset doesn't have missing values)
-# missing_values <- sapply(datos, function(x) sum(is.na(x))/length(x) * 100)
+missing_values <- sapply(datos, function(x) sum(is.na(x))/length(x) * 100)
 
 # we plot the results of the missing values data 
 barplot(missing_values, main = "Porcentage of missing values", xlab = "", ylab = "Porcentage of missing values", col = "steelblue", las = 2, ylim = c(0, 100))
@@ -222,11 +236,14 @@ barplot(missing_values, main = "Porcentage of missing values", xlab = "", ylab =
 
 In the plot we can see clearly that **there are not missing values.** We are not need in our case to study the random pattern of the missing values.
 
-If we would have obtained more than 5% of missing values on any feature, we would have to analyze the random patterns. As we have continuous variables we would have needed to apply a Student test. Regarding the results of the applied test we would have obtained that the pattern is random or not, and in both cases, replacing the missing values by the mean or median.
+If we would have obtained more than 5% of missing values on any feature, we would have to analyze the random patterns.
+As we have continuous variables we would have needed to apply a Student test.
+Regarding the results of the applied test we would have obtained that the pattern is random or not, and in both cases, replacing the missing values by the mean or median.
 
 ### 2.3 Classical numeric descriptive analysis
 
-Following, we are going to compute basic statistics measures to gather more information about or data. As the variables are quantitative, we are going to compute **basic numerical descriptive statistics, their histograms, density and boxplot.**
+Following, we are going to compute basic statistics measures to gather more information about or data.
+As the variables are quantitative, we are going to compute **basic numerical descriptive statistics, their histograms, density and boxplot.**
 
 ```{r}
 # for every feature except the ID
@@ -278,7 +295,8 @@ for(col in names(datos)[-1]) {
 
 ```
 
-Just as an addition to all information gathered, we are interested on seeing the Target feature of the dataset, "Diagnosis". Therefore, we will show some graphical outputs about this categorical variable.
+Just as an addition to all information gathered, we are interested on seeing the Target feature of the dataset, "Diagnosis".
+Therefore, we will show some graphical outputs about this categorical variable.
 
 ```{r}
 # frequency tables
@@ -304,7 +322,8 @@ print(ggarrange(p1, p2, nrow = 1, ncol = 2, common.legend = TRUE))
 
 In this section we will try to identify outliers in each feature as some methods we will use along this proyect are sensitive to the presence of outliers.
 
-We have to remind that all our features are numerical variables so we can apply some graphs methods to identify intuitively the outliers. It is remarkable that firstly we standarize the data because, as we can see in the previous sections, our features have different scales.
+We have to remind that all our features are numerical variables so we can apply some graphs methods to identify intuitively the outliers.
+It is remarkable that firstly we standarize the data because, as we can see in the previous sections, our features have different scales.
 
 ```{r}
 
@@ -350,7 +369,9 @@ for (col in columnas) {
 
 ```
 
-In both graphs we can see that there are outliers in almost every feature. Regarding this, we can eliminate them or replace by the mean or median. As this is not rigurous we are going to take the one option who give us better results.
+In both graphs we can see that there are outliers in almost every feature.
+Regarding this, we can eliminate them or replace by the mean or median.
+As this is not rigurous we are going to take the one option who give us better results.
 
 ```{r}
 # ---   OUTLIERS METHODOLOGY ---
@@ -398,7 +419,9 @@ for (col in columnas) {
 
 ### 2.5 Univariate normality
 
-As many techniques can not avoid the assumption of normality is necessary to check the distribution of each feature of the dataset. In order to analyze their distribution we are going to use two techniques. The first one is graphical, using the funcion qqplot, and the second one is about applying the Univariate normality test (Shapiro-Wilk).
+As many techniques can not avoid the assumption of normality is necessary to check the distribution of each feature of the dataset.
+In order to analyze their distribution we are going to use two techniques.
+The first one is graphical, using the funcion qqplot, and the second one is about applying the Univariate normality test (Shapiro-Wilk).
 
 ```{r}
 columnas <- colnames(datos_preprocessed[-1])
@@ -437,7 +460,8 @@ for (j0 in columnas) {
 
 ```
 
-With this exploratory analysis we can have a general idea of the possible normal distribution of the univariate variables. However, as these are graphical outputs and the test is just our "sight" we will apply some more mathematical and numerical test to accept the assumption of normality.
+With this exploratory analysis we can have a general idea of the possible normal distribution of the univariate variables.
+However, as these are graphical outputs and the test is just our "sight" we will apply some more mathematical and numerical test to accept the assumption of normality.
 
 The null hypothesis of the test is that the data **follow a univariate normal distribution.** This hypothesis is rejected if the p-value given by the Shapiro-Wilk test is less than 0.05.
 
@@ -456,13 +480,16 @@ print(resultados)
 
 ```
 
-Looking on the results obtained we can see that despite we obtained in the graphical outputs that the most part of the variables followed a normal distribution, actually they do not follow a normal distribution. Thanks to the Shapiro-Wilk test we were able to prove it, and it is a important test always to contrast what "we think" with the mathematically right results.
+Looking on the results obtained we can see that despite we obtained in the graphical outputs that the most part of the variables followed a normal distribution, actually they do not follow a normal distribution.
+Thanks to the Shapiro-Wilk test we were able to prove it, and it is a important test always to contrast what "we think" with the mathematically right results.
 
 ## 3. Multivariate Exploratory Analysis
 
 ### 3.1 Correlation
 
-Firstly, it is necessary to check if the variables are or not independent. We could do it observing the correlation matrix, at sample level. At population level, we could check if there is correlation using Bartlett's Test (this test is used to test the null hypothesis, $H_0$ that all $k$ population variances are equal against the alternative that at least two are different).
+Firstly, it is necessary to check if the variables are or not independent.
+We could do it observing the correlation matrix, at sample level.
+At population level, we could check if there is correlation using Bartlett's Test (this test is used to test the null hypothesis, $H_0$ that all $k$ population variances are equal against the alternative that at least two are different).
 
 ```{r}
 ###############################
@@ -478,7 +505,8 @@ correlation_matrix
 det(correlation_matrix)
 ```
 
-It is noticed an important correlation between some variables. For example, we can see it between perimeter1 and area:
+It is noticed an important correlation between some variables.
+For example, we can see it between perimeter1 and area:
 
 ```{r}
 cor(datos_preprocessed$perimeter1, datos_preprocessed$area1)
@@ -522,7 +550,8 @@ PCA<-prcomp(datos_preprocessed[-1], scale=T, center=T)
 PCA$rotation
 ```
 
-At field "sdev" PCA object we can find standard deviations of each principal component. With summary function applied to PCA object, we obtain some interesting measures:
+At field "sdev" PCA object we can find standard deviations of each principal component.
+With summary function applied to PCA object, we obtain some interesting measures:
 
 ```{r}
 PCA$sdev
@@ -577,11 +606,15 @@ for(element in PCA$sdev^2){
 }
 ```
 
-So, we would only consider the first 6th components. They accumulate near to 82% of the explained variance. Each principal component is obtained as linear combination of all components with the coefficients indicated at the columns of rotation matrix.
+So, we would only consider the first 6th components.
+They accumulate near to 82% of the explained variance.
+Each principal component is obtained as linear combination of all components with the coefficients indicated at the columns of rotation matrix.
 
-There is the possibility of representing different pairwise comparisons between the principal components, but since we have 6 principal components, we would have to create $\frac{6!}{2} = 360$ graphs, which is impractical. Instead, we will only make the comparison graphs between first and second principal component, which are in fact, the two ones with most part of the explicable variance.
+There is the possibility of representing different pairwise comparisons between the principal components, but since we have 6 principal components, we would have to create $\frac{6!}{2} = 360$ graphs, which is impractical.
+Instead, we will only make the comparison graphs between first and second principal component, which are in fact, the two ones with most part of the explicable variance.
 
-Firstly, the following graphical outputs show the projection of the variables in two dimensions. Display the weight of the variable in the direction of the principal component.
+Firstly, the following graphical outputs show the projection of the variables in two dimensions.
+Display the weight of the variable in the direction of the principal component.
 
 ```{r}
 p1<-fviz_pca_var(PCA,repel = T, col.var = "cos2", legend.title="Distance", title="Variables")+theme_bw()
@@ -589,7 +622,8 @@ p1<-fviz_pca_var(PCA,repel = T, col.var = "cos2", legend.title="Distance", title
 p1
 ```
 
-It is also possible to represent the observations. As well as identify with colors those observations that explain the greatest variance of the principal components.
+It is also possible to represent the observations.
+As well as identify with colors those observations that explain the greatest variance of the principal components.
 
 ```{r}
 p1<-fviz_pca_ind(PCA, col.ind = "contrib", gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
@@ -598,7 +632,8 @@ p1<-fviz_pca_ind(PCA, col.ind = "contrib", gradient.cols = c("#00AFBB", "#E7B800
 p1
 ```
 
-Now, joint representation of variables and observations. Relates the possible relationships between the contributions of the records to the variances of the components and the weight of the variables in each principal component.
+Now, joint representation of variables and observations.
+Relates the possible relationships between the contributions of the records to the variances of the components and the weight of the variables in each principal component.
 
 ```{r}
 p1<-fviz_pca(PCA, alpha.ind = "contrib", col.var="cos2", col.ind="seagreen", gradient.cols = c("#FDF50E", "#FD960E", "#FD1E0E"), repel = T, legend.title = "Distancia") + theme_bw()
@@ -608,7 +643,8 @@ p1
 
 ### 3.4 Factorial Analysis
 
-First of all in this section, different graphical outputs are illustrated below that provide an intuitive idea of correlation between the variables. A *trained eye* could anticipate the appropriate number of factor with this visual information.
+First of all in this section, different graphical outputs are illustrated below that provide an intuitive idea of correlation between the variables.
+A *trained eye* could anticipate the appropriate number of factor with this visual information.
 
 ```{r}
 # Polychoric correlation matrix
@@ -630,9 +666,12 @@ datos_preprocessed_correlations<-correlate(datos_preprocessed[-1]) #Correlations
 rplot(datos_preprocessed_correlations, legend = T, colours = c("firebrick1", "black", "darkcyan"), print_cor = T)
 ```
 
-Observing the graphical outputs, it seems to be between 3 and 4 groups for latent variables with high correlation with a group of observable variables and low correlation with the others. It can help us to decide which is the optimum number of factor for our Factorial Analysis.
+Observing the graphical outputs, it seems to be between 3 and 4 groups for latent variables with high correlation with a group of observable variables and low correlation with the others.
+It can help us to decide which is the optimum number of factor for our Factorial Analysis.
 
-Now, we must choose a method to extract the factors: main factor, likelihood, etc. First, we will compare the outputs of the maximum likelihood method and minimal residual model. We will calculate 3 factors due to the last graphs.
+Now, we must choose a method to extract the factors: main factor, likelihood, etc.
+First, we will compare the outputs of the maximum likelihood method and minimal residual model.
+We will calculate 3 factors due to the last graphs.
 
 ```{r}
 ### Test of two models with three factors
@@ -649,7 +688,8 @@ print("Model 2: minimal residual model")
 model2$loadings
 ```
 
-Now, a comparison of the communalities of these two methods is illustrated. It appears that communalities of the likelihood model are lower than those of the minimum residual model.
+Now, a comparison of the communalities of these two methods is illustrated.
+It appears that communalities of the likelihood model are lower than those of the minimum residual model.
 
 ```{r}
 # Comparing communalities
@@ -659,7 +699,8 @@ sort(model2$communality, decreasing = T)->c2
 cbind(c1,c2)
 ```
 
-A comparison of uniqueness is also performed. That is the proportion of variance that has not been explained by the factor (1 - communality)
+A comparison of uniqueness is also performed.
+That is the proportion of variance that has not been explained by the factor (1 - communality)
 
 ```{r}
 sort(model1$uniquenesses, decreasing = T)->u1
@@ -671,7 +712,13 @@ We can observe that with the minimal residual model we obtain higher values, the
 
 ### 3.5 Choosing the optimal number of factors to consider
 
-There are different criteria, among which the Scree plot and parallel analysis stand out. The **Scree plot** consist in represent the scree plot obtained from the representation of eigenvalues in descendant order at Y-axis and the number of latent factors at X-axis. Joining the points we obtain a figure that starts with a strong drop and then a leveling-off. The methods indicates that we have to choose the number of factors where the graphical output makes an "elbow". The parallel analysis is a technique designed to help take some of the subjectivity out of interpreting the scree plot. Graphically, it identifies the point where the cumulative explained variance of real data significantly surpasses the average cumulative explained variance of random data, determining the optimal number of factors to retain. This method helps prevent overextraction of factors.
+There are different criteria, among which the Scree plot and parallel analysis stand out.
+The **Scree plot** consist in represent the scree plot obtained from the representation of eigenvalues in descendant order at Y-axis and the number of latent factors at X-axis.
+Joining the points we obtain a figure that starts with a strong drop and then a leveling-off.
+The methods indicates that we have to choose the number of factors where the graphical output makes an "elbow".
+The parallel analysis is a technique designed to help take some of the subjectivity out of interpreting the scree plot.
+Graphically, it identifies the point where the cumulative explained variance of real data significantly surpasses the average cumulative explained variance of random data, determining the optimal number of factors to retain.
+This method helps prevent overextraction of factors.
 
 ```{r}
 # Scree plot
@@ -693,31 +740,41 @@ factanal(datos, factors=5, rotation="none", lower=0.02)
 
 So, we do not reject the null hypothesis, and we will use 5 factors.
 
-Finally, we will make an estimation of the factorial model with 5 factors. We implement a varimax rotation to seek a simpler interpretation.
+Finally, we will make an estimation of the factorial model with 5 factors.
+We implement a varimax rotation to seek a simpler interpretation.
 
 ```{r}
 varimax_model<-fa(poly_cor, nfactors=5, rotate="varimax", fa="minres")
 ```
 
-We obtain a warning telling us an ultra-Heywood case was detected. Since communalities are squared correlations, you would expect them always to lie between 0 and 1. It is a mathematical peculiarity of the common factor model, however, that final communality estimates might exceed 1. If a communality exceeds 1, it is an ultra-Heywood case. It implies that some unique factor has negative variance, a clear indication that something is wrong. One possible cause is that we are using too much factors. Let's try with 3 factors:
+We obtain a warning telling us an ultra-Heywood case was detected.
+Since communalities are squared correlations, you would expect them always to lie between 0 and 1.
+It is a mathematical peculiarity of the common factor model, however, that final communality estimates might exceed 1.
+If a communality exceeds 1, it is an ultra-Heywood case.
+It implies that some unique factor has negative variance, a clear indication that something is wrong.
+One possible cause is that we are using too much factors.
+Let's try with 3 factors:
 
 ```{r}
 varimax_model<-fa(poly_cor, nfactors=3, rotate="varimax", fa="minres")
 ```
 
-Here we do not get any warning of an ultra-Heywood case. We will run again our previous hypothesis test, but now with three factors.
+Here we do not get any warning of an ultra-Heywood case.
+We will run again our previous hypothesis test, but now with three factors.
 
 ```{r}
 factanal(datos, factors=3, rotation="none", lower=0.03)
 ```
 
-So, then we will use 3 factors in our model. Now, the rotated factorial matrix is shown.
+So, then we will use 3 factors in our model.
+Now, the rotated factorial matrix is shown.
 
 ```{r}
 print(varimax_model$loadings, cut = 0)
 ```
 
-Visually we could make the effort to see what variables each correlates with one of the factors, but it is very tedious. So we use the following representation in diagram mode.
+Visually we could make the effort to see what variables each correlates with one of the factors, but it is very tedious.
+So we use the following representation in diagram mode.
 
 ```{r}
 fa.diagram(varimax_model)
@@ -731,7 +788,8 @@ As the multivariate normality can be affected by the presence of multivariate ou
 outliers <- mvn(data = datos[,-1], mvnTest = "hz", multivariateOutlierMethod = "quan")
 ```
 
-Therefore, as the number of outliers is enough small, we can perfom the following tests in order to find some evidence of lack of multivariate normality.
+Therefore, the number of outliers is bigger than we expected.
+Anyway, we will continue with the following tests, despite the big amount of outliers, in order to find some evidences of lack of multivariate normality.
 
 ```{r}
 royston_test <- mvn(data = datos_preprocessed[,-1], mvnTest = "royston", multivariatePlot = "qq")
@@ -754,17 +812,18 @@ datos2 <- datos2[, c('ID', names(datos2)[-ncol(datos2)])]
 datos2
 ```
 
-Considering now this qualitative variable "DIAGNOSIS", it is interesting to build a classifier to distinct between its two categories: 
-  - M: Denotes "Malignant" 
-  - B: Denotes "Benign"
-In order to to classify cancer impact and patients' health. So Diagnosis would be or response variable and the other ones except ID would be the explanatory variables.
+Considering now this qualitative variable "DIAGNOSIS", it is interesting to build a classifier to distinct between its two categories: - M: Denotes "Malignant" - B: Denotes "Benign" In order to to classify cancer impact and patients' health.
+So Diagnosis would be or response variable and the other ones except ID would be the explanatory variables.
+
 ```{r}
 # The response variable has to be an object of the class 'factor' of R language
 datos2$DIAGNOSIS<-as.factor(datos2$DIAGNOSIS)
 ```
+
 ### 4.1 Graphical exploration of data
 
 First, we explore how well (or poorly) each of the explanatory variables considered independently classifies the Diagnosis.
+
 ```{r}
 diagnosis <- datos2$DIAGNOSIS
 
@@ -789,39 +848,10 @@ for (col in explanatory) {
 #           nrow=3, common.legend = TRUE)
 ```
 
-# ```{r}
-# ggarrange(g_list[[1]], g_list[[2]], g_list[[3]], nrow=3, common.legend = TRUE)
-# ```
-# ```{r}
-# ggarrange(g_list[[4]], g_list[[5]], g_list[[6]], nrow=3, common.legend = TRUE)
-# ```
-# ```{r}
-# ggarrange(g_list[[7]], g_list[[8]], g_list[[9]], nrow=3, common.legend = TRUE)
-# ```
-# ```{r}
-# ggarrange(g_list[[10]], g_list[[11]], g_list[[12]], nrow=3, common.legend = TRUE)
-# ```
-# ```{r}
-# ggarrange(g_list[[13]], g_list[[14]], g_list[[15]], nrow=3, common.legend = TRUE)
-# ```
-# ```{r}
-# ggarrange( g_list[[16]], g_list[[17]], g_list[[18]], nrow=3, common.legend = TRUE,heights = c(5,5,5))
-# ```
-# ```{r}
-# ggarrange(g_list[[19]], g_list[[20]], g_list[[21]], nrow=3, common.legend = TRUE)
-# ```
-# ```{r}
-# ggarrange(g_list[[22]], g_list[[23]], g_list[[24]], nrow=3, common.legend = TRUE)
-# ```
-# ```{r}
-# ggarrange(g_list[[25]],g_list[[26]], g_list[[27]], nrow=3, common.legend = TRUE)
-# ```
-# ```{r}
-# ggarrange(g_list[[28]], g_list[[29]], g_list[[30]], nrow=3, common.legend = TRUE)
-#```
-
 We could see that area1, concave_points1, radius3, area3, perimeter3 and concave_points3 are the best options to differentiate between benign and malignant.
-Next, we could think about exploring which pairs of variables best separate between diagnosis but due to the high number of explanatory variables we have, this technique would generate too many combinations and that's not worthy. However, we add the commented code to give the possibility of visualizing graphics of pairs of variables for each axis (variables grouped 10 by 10).
+Next, we could think about exploring which pairs of variables best separate between diagnosis but due to the high number of explanatory variables we have, this technique would generate too many combinations and that's not worthy.
+However, we add the commented code to give the possibility of visualizing graphics of pairs of variables for each axis (variables grouped 10 by 10).
+
 ```{r}
 # exp1<-explanatory[1:10]
 # exp2<-explanatory[11:20]
@@ -841,10 +871,13 @@ Next, we could think about exploring which pairs of variables best separate betw
 # # text(1, 2, "A", col = "blue", pos = 4)
 # # text(1, 1.8, "B", col = "orange", pos = 4)
 ```
+
 We have the same problem, even bigger, if we try to do this visual analysis with groups of three variables.
 
 ### 4.2) Univariate and multivariate normality
-Next we make a graphical exploration of the normality of the univariate distributions but considering now the diagnosis category. 
+
+Next we make a graphical exploration of the normality of the univariate distributions but considering now the diagnosis category.
+
 ```{r}
 datos3<-datos2[-1]
 datos3
@@ -878,7 +911,9 @@ for (k in 2:31) {
   }
 }
 ```
-We could think that just a few of the variables in axis x and z follow a normal univariate distribution determined by their diagnosis. But then, for greater and numerical certainty, we do the respective normality tests.
+
+We could think that just a few of the variables in axis x and z follow a normal univariate distribution determined by their diagnosis.
+But then, for greater and numerical certainty, we do the respective normality tests.
 
 ```{r}
 datos_tidy <- melt(datos3, value.name = "value")
@@ -888,27 +923,37 @@ results <- aggregate(formula = value ~ DIAGNOSIS + variable, data = datos_tidy, 
 results <- results[, c(2, 1, 3)]
 
 # new column to find if the value obtained is greater than the p-value
-results$NORMALITY <- ifelse(resultados$value < 0.05, "NO", "YES")
+results$NORMALITY <- ifelse(results$value < 0.05, "NO", "YES")
 
 #Print results
 print(results)
 ```
 
-There's a high lack of univariate normality as we could imagine because of the previous results in section 2.5. There's a lack of multivariate normality aswell as we proved before in section 3.6. Therefore, the final phase of the analysis and linear model results are not well supported and also not reliable.
+There's a high lack of univariate normality as we could imagine because of the previous results in section 2.5.
+There's a lack of multivariate normality aswell as we proved before in section 3.6.
+Therefore, the final phase of the analysis and linear model results are not well supported and also not reliable.
 
 ### 4.3) Homogeneity of variance
 
-When multiple predictors are used, it must be verified that the covariance matrix is constant in all groups. In this case it is also advisable to check the homogeneity of the variance for each predictor at the individual level. So we apply now the most recommended test that is the Box M test, which is an extension of the Barttlet test for multivariate scenarios. 
-It must be taken into account that it is very sensitive to whether the data are actually distributed according to a multivariate normal. For this reason, it is recommended to use a significance (p-value) <0.001 to reject the null hypothesis. However, the lack of MND let us think that this test won't provide useful information for the later model.
+When multiple predictors are used, it must be verified that the covariance matrix is constant in all groups.
+In this case it is also advisable to check the homogeneity of the variance for each predictor at the individual level.
+So we apply now the most recommended test that is the Box M test, which is an extension of the Barttlet test for multivariate scenarios.
+It must be taken into account that it is very sensitive to whether the data are actually distributed according to a multivariate normal.
+For this reason, it is recommended to use a significance (p-value) \<0.001 to reject the null hypothesis.
+However, the lack of MND let us think that this test won't provide useful information for the later model.
 
 ```{r}
 boxM(data = datos3[, c(2:31)], grouping = datos3$DIAGNOSIS)
 ```
-As we expected we reject the null hypothesis since p-value is practically zero and therefore we cannot assume homogeneity of variances. Also it is important to remember that for this conclusion to be reliable the assumption of multivariate normality must be met, which, in this case, that's not the case. We knew in advance that the results won't be positive and not even reliable.
+
+As we expected we reject the null hypothesis since p-value is practically zero and therefore we cannot assume homogeneity of variances.
+Also it is important to remember that for this conclusion to be reliable the assumption of multivariate normality must be met, which, in this case, that's not the case.
+We knew in advance that the results won't be positive and not even reliable.
 
 ### 4.4) Discriminat function
 
-At this point our data do not satisfy the assumptions needed (multivariate normality and homogeneity of variance) so there wouldn't be recommendable continuing forward with the linear discriminant classification model. However, once again, we keep here the code to exemplify how it would be done.
+At this point our data do not satisfy the assumptions needed (multivariate normality and homogeneity of variance) so there wouldn't be recommendable continuing forward with the linear discriminant classification model.
+However, once again, we keep here the code to exemplify how it would be done.
 
 ```{r}
 modelo_lda <- lda(formula = diagnosis ~ radius1 + texture1 + perimeter1 + area1 + smoothness1 + compactness1 + concavity1 + concave_points1 + symmetry1 + fractal_dimension1 +
@@ -917,6 +962,7 @@ modelo_lda <- lda(formula = diagnosis ~ radius1 + texture1 + perimeter1 + area1 
                   data = datos2)
 modelo_lda
 ```
+
 The output of this object shows us the prior probabilities of each group, in this case 0.6274165 for benign and 0.3725835 for malignant, the means of each regressor per group and the coefficients of the linear discriminant classification model.
 Now we are able to classify new data based on its measurements by simply calling the predict function.
 
@@ -925,9 +971,11 @@ Now we are able to classify new data based on its measurements by simply calling
 nuevas_observaciones <- data.frame(radius1 = 17.990, texture1 = 17.77, perimeter1 = 130.00, area1= 1203.0, smoothness1 = 0.09463, compactness1 = 0.23960, concavity1 = 0.1127000, concave_points1 = 0.080890, symmetry1 = 0.2087, fractal_dimension1 = 0.05742, radius2 = 0.5435, texture2 = 0.7813, perimeter2 = 3.3980, area2 = 24.320, smoothness2 = 0.006399, compactness2 = 0.024610, concavity2 = 0.0225400, concave_points2 = 0.014320, symmetry2 = 0.013890, fractal_dimension2 = 0.0045710, radius3 = 14.910, texture3 = 16.67, perimeter3 = 103.40	, area3 = 1606.0, smoothness3 = 0.16540, compactness3 = 0.54010, concavity3 = 1.105000, concave_points3 = 0.206000, symmetry3 = 0.4601, fractal_dimension3 = 0.07678)
 predict(object = modelo_lda, newdata = nuevas_observaciones)
 ```
+
 I pick only values from the first 10 rows, all classified as M (malignant) but the classifier output is class B (benign).
 
 ### 4.5) Model validation
+
 We divide the original dataset into two subsets: the first, known as training set, with approximately 80% of the records, which will be used to fit a new model but always lineal one (model_lda_1 instead of model_lda); and the second, known as test set, with 20% of the remaining records, which will be used for cross-validation.
 We use a new model to make the distinction between training and test datasets.
 
@@ -970,13 +1018,17 @@ modelo_lda_1 <- lda(formula = diagnosis_training ~ radius1 + texture1 + perimete
 pred <- predict(modelo_lda_1, dimen = 1)
 confusionmatrix(training_set$DIAGNOSIS, pred$class)
 ```
+
 Confusion matrix for the training set.
+
 ```{r}
 # Classification error percentage
 trainig_error <- mean(training_set$DIAGNOSIS != pred$class) * 100
 paste("trainig_error=", trainig_error, "%")
 ```
-We visualize now the training set classification error percentage but we are interested in the test set error because it is where the validation is usually done. 
+
+We visualize now the training set classification error percentage but we are interested in the test set error because it is where the validation is usually done.
+
 ```{r}
 # Predictions on the test set
 pred_test <- predict(modelo_lda_1, newdata = test_set, dimen = 1)
@@ -985,49 +1037,67 @@ pred_test <- predict(modelo_lda_1, newdata = test_set, dimen = 1)
 confusion_matrix_test <- table(test_set$DIAGNOSIS, pred_test$class)
 print(confusion_matrix_test)
 ```
+
 Confusion matrix for the test set.
+
 ```{r}
 # Classification error percentage for the test set
 test_error <- mean(test_set$DIAGNOSIS != pred_test$class) * 100
 paste("test_error =", test_error, "%")
 ```
-In this case the correct classifications rate is 95.61% aprox. It seems like a good result but in terms of cancer diagnosis maybe it is not enough (We are not medical experts to judge that).
+
+In this case the correct classifications rate is 95.61% aprox.
+It seems like a good result but in terms of cancer diagnosis maybe it is not enough (We are not medical experts to judge that).
 
 ### 4.6) Displaying rankings
+
 We try to display an example considering all the dataset
+
 ```{r}
 partimat(DIAGNOSIS ~  radius1 + texture1 + perimeter1 + area1 + smoothness1 + compactness1 + concavity1 + concave_points1 + symmetry1 + fractal_dimension1 ,
          data = datos2[-1], method = "lda", prec = 200,
          image.colors = c("green", "orange"),
          col.mean = "yellow",nplots.vert =1, nplots.hor=3)
 ```
-We could see how chaotic the results are if we make with all the dataset instead of only the test-set. 
+
+We could see how chaotic the results are if we make with all the dataset instead of only the test-set.
 Now we display some examples with the first axis variables and the test set without the intention of obtaining good results.
+
 ```{r}
 partimat(diagnosis_test ~  radius1 + texture1 + perimeter1 + area1 + smoothness1 + compactness1 + concavity1 + concave_points1 + symmetry1 + fractal_dimension1 ,
          data = test_set, method = "lda", prec = 200,
          image.colors = c("green", "orange"),
          col.mean = "yellow",nplots.vert =1, nplots.hor=3)
 ```
-In case of using the test set, we could visualize better the points.
-Results: Every classification has at least an error of 10% more or less, few of then even up to 30% or very close to it. So they're not good models. 
 
-Let's try with radius1, area1, concave_points1, radius3, area3, perimeter3 and concave_points3. Variables that seemed before they were good individual options to build the classifier.
+In case of using the test set, we could visualize better the points.
+Results: Every classification has at least an error of 10% more or less, few of then even up to 30% or very close to it.
+So they're not good models.
+
+Let's try with radius1, area1, concave_points1, radius3, area3, perimeter3 and concave_points3.
+Variables that seemed before they were good individual options to build the classifier.
 Let see how "they work in pairs" cosidering again all the dataset.
+
 ```{r}
 partimat(DIAGNOSIS ~ radius1 + area1 + concave_points1 + radius3 + area3 + perimeter3 + concave_points3 ,
          data = datos2[-1], method = "lda", prec = 200,
          image.colors = c("green", "orange"),
          col.mean = "yellow",nplots.vert =1, nplots.hor=3)
 ```
-The classifiers built with 3 type variables (axis z variables) have a bit lower error, specially the last three classifiers (concave_points3 with radius3, area3 and perimeter3). They have an error equal to 6%. The best pairs-classifiers obtained until now. So if a classification model were made with two predictors, this pair would be considered.
+
+The classifiers built with 3 type variables (axis z variables) have a bit lower error, specially the last three classifiers (concave_points3 with radius3, area3 and perimeter3).
+They have an error equal to 6%.
+The best pairs-classifiers obtained until now.
+So if a classification model were made with two predictors, this pair would be considered.
 
 ## **5. Quadratic Discriminant Analysis (QDA)**
 
-As for the Linear Discriminant Analysis, to carry out the Quadratic Discriminant Analysis we should begin with the graphical exploration of the data and the checks about the hypothesis on univariate and multivariate normality and homogeneity of the variances, which have already been previously done. Then we now that there's not assumption of MNV, nevertheless the quadratic discriminant analysis has a certain robustness in this case. Also there's NO homogeneity of variances.
-
+As for the Linear Discriminant Analysis, to carry out the Quadratic Discriminant Analysis we should begin with the graphical exploration of the data and the checks about the hypothesis on univariate and multivariate normality and homogeneity of the variances, which have already been previously done.
+Then we now that there's not assumption of MNV, nevertheless the quadratic discriminant analysis has a certain robustness in this case.
+Also there's NO homogeneity of variances.
 
 ### 5.1 Discriminant Function
+
 Although the assumption of multivariate normality is not verified, taking into account that the variances are not homogeneous, a quadratic discriminant model is adjusted because it is robust against the lack of this assumption, although it must be kept in mind given the possibility of obtaining unexpected results.
 
 ```{r}
@@ -1038,15 +1108,21 @@ modelo_qda <- qda(diagnosis_training ~ radius1 + texture1 + perimeter1 + area1 +
                   data = training_set)
 modelo_qda
 ```
-The output of this object shows us the prior probabilities of each group. Now they are a bit different from those ones obtained in model_lda because in this case we are using just the training set data instead of all the dataset. It also shows the means of each regressor per group.
 
-Once the classifier is built, we can classify new data based on its measurements by simply calling the predict function. We classify all the observations in the test set.
+The output of this object shows us the prior probabilities of each group.
+Now they are a bit different from those ones obtained in model_lda because in this case we are using just the training set data instead of all the dataset.
+It also shows the means of each regressor per group.
+
+Once the classifier is built, we can classify new data based on its measurements by simply calling the predict function.
+We classify all the observations in the test set.
+
 ```{r}
 nuevas_observaciones <- test_set
 predict(object = modelo_qda, newdata = nuevas_observaciones)
 ```
 
 ### 5.2 Model validation
+
 ```{r}
 # Confusion matrix
 pred <- predict(object = modelo_qda, newdata = test_set)
@@ -1058,12 +1134,16 @@ confusionmatrix(test_set$DIAGNOSIS, pred$class)
 test_error <- mean(test_set$DIAGNOSIS != pred$class) * 100
 paste("test_error=", test_error, "%")
 ```
+
 In this case the correct classifications rate is 93.86%.
 
 ### 5.3 Displaying rankings
-Analogous to LDA part, we display some graphics to check quadratic classifiers grouping variables by pairs. Always considering tghe testset data.
+
+Analogous to LDA part, we display some graphics to check quadratic classifiers grouping variables by pairs.
+Always considering tghe testset data.
 
 Example with axis x variables:
+
 ```{r}
 partimat(formula = diagnosis_test ~ radius1 + texture1 + perimeter1 + area1 + smoothness1 + compactness1 + concavity1 + concave_points1 + symmetry1 + fractal_dimension1,
                                     #radius2 + texture2 + perimeter2 + area2 + smoothness2 + compactness2 + concavity2 + concave_points2 + symmetry2 + fractal_dimension2 +
@@ -1072,7 +1152,9 @@ partimat(formula = diagnosis_test ~ radius1 + texture1 + perimeter1 + area1 + sm
          image.colors = c("skyblue2", "darkgoldenrod1"),
          col.mean = "green", nplots.vert =1, nplots.hor=3)
 ```
+
 Results with best individual variables considered:
+
 ```{r}
 partimat(formula = diagnosis_test ~ radius1 + area1 + concave_points1 + radius3 + area3 + perimeter3 + concave_points3,
          data = test_set, method = "qda", prec = 400,
@@ -1081,25 +1163,27 @@ partimat(formula = diagnosis_test ~ radius1 + area1 + concave_points1 + radius3 
 ```
 
 We try now considering all the dataset:
+
 ```{r}
 partimat(formula = DIAGNOSIS ~ radius1 + area1 + concave_points1 + radius3 + area3 + perimeter3 + concave_points3,
          data = datos2[-1], method = "qda", prec = 400,
          image.colors = c("skyblue2", "darkgoldenrod1"),
          col.mean = "green", nplots.vert =1, nplots.hor=3)
 ```
+
 Similar to LDA case, the best classification of the data is the one given by the predictors radius3 and concave_points3 but now with more accuracy (particular and general case).
 Then we could confirm that with a large number of training observations available, QDA is more appropriate than LDA (also in our case we couldn't rely on LDA results).
 
-
 ## **6. Cluster Analysis**
+
 Additionally, we are performing a cluster analysis to confirm that the grouping of the response variable used in the classification models (DIAGNOSIS) is appropriate.
 
 ### 6.1 Data Preparation
-To perform a cluster analysis with R, the data must be prepared as follows:
-  1 • Ensure that the rows are records of observations and that the columns are the variables of interest (data.frame type structure).
-  2 • The missing values must be adequately treated (eliminate or replace their value).
-  3 • It must be decided whether to work with standardized data to make variables measured on different scales comparable.
-  
+
+To perform a cluster analysis with R, the data must be prepared as follows: 1 • Ensure that the rows are records of observations and that the columns are the variables of interest (data.frame type structure).
+2 • The missing values must be adequately treated (eliminate or replace their value).
+3 • It must be decided whether to work with standardized data to make variables measured on different scales comparable.
+
 In our case: datos2[-2] verifies 1), there's no missing values in our dataset so we also verifies 2)
 
 ```{r}
@@ -1109,6 +1193,7 @@ head(datos_cluster)
 ```
 
 We check means and standard deviations to establish if the data are standardized:
+
 ```{r}
 columnas <- colnames(datos_cluster)
 medias <- list()
@@ -1127,6 +1212,7 @@ print(paste("Desviaciones estándar:", paste(sd, collapse = ", ")))
 ```
 
 Our data are not standardized because they doo't have a mean of 0 and a standard deviation of 1, so 3) is not verified and we correct it:
+
 ```{r}
 # To prevent the cluster analysis from being influenced by any arbitrary variable, the data are standard
 datos_cluster<-as.data.frame(scale(datos_cluster))
@@ -1137,36 +1223,51 @@ head(datos_cluster)
 Now our data are prepared for CA.
 
 ### 6.2 Distance Information
-To classify observations into groups it is necessary to choose appropriate measures of similarity, or distance (dissimilarity), that provide information on how similar any two observations are. Almost all the usual software for cluster analysis uses the Euclidean distance so we opt for using this one as R default option.
 
-The following distance matrix shows in brown those states that present large dissimilarities (distances), compared to those that seem closer in yellow. The color white is used to refer to those states with distances that are not so extreme as to be considered low or high.
+To classify observations into groups it is necessary to choose appropriate measures of similarity, or distance (dissimilarity), that provide information on how similar any two observations are.
+Almost all the usual software for cluster analysis uses the Euclidean distance so we opt for using this one as R default option.
+
+The following distance matrix shows in brown those states that present large dissimilarities (distances), compared to those that seem closer in yellow.
+The color white is used to refer to those states with distances that are not so extreme as to be considered low or high.
+
 ```{r}
 distance<- get_dist(datos_cluster)
 fviz_dist(distance, gradient = list(low ="yellow", mid = "white", high = "brown"))
 ```
+
 ### 6.3 Hierarchical clustering: Ward’s method
-Hierarchical clustering is interested in finding a hierarchy based on the closeness or similarity of the data according to the distance considered. In the agglomerative case, we start from a group with the closest observations. The next closest pairs are then calculated and groups are generated in an ascending manner.
+
+Hierarchical clustering is interested in finding a hierarchy based on the closeness or similarity of the data according to the distance considered.
+In the agglomerative case, we start from a group with the closest observations.
+The next closest pairs are then calculated and groups are generated in an ascending manner.
 This construction can be observed visually by means of a dendrogram and the selection of the optimal number of groups can be also estimated from this same graph.
+
 ```{r}
 dendrogram <- hclust(dist(datos_cluster, method = 'euclidean'), method = 'ward.D')
 ggdendrogram(dendrogram, rotate = FALSE, labels = FALSE, theme_dendro = TRUE) +
 labs(title = "Dendrograma")
 ```
-On the horizontal axis of the dendrogram we have each of the data that make up the input set, while on the vertical axis the Euclidean distance that exists between each group is represented, as that these are becoming hierarchical.
-Each vertical line in the diagram represents a grouping. (UP -> less groups / DOWN -> more groups)
 
-One way to determine the appropriate K number of groups is to cut the dendrogram at that height of the diagram that best represents the input data. However, we are going to explore other options.
+On the horizontal axis of the dendrogram we have each of the data that make up the input set, while on the vertical axis the Euclidean distance that exists between each group is represented, as that these are becoming hierarchical.
+Each vertical line in the diagram represents a grouping.
+(UP -\> less groups / DOWN -\> more groups)
+
+One way to determine the appropriate K number of groups is to cut the dendrogram at that height of the diagram that best represents the input data.
+However, we are going to explore other options.
 
 ### 6.4 Determination of the optimal number of clusters
 
-Below are three of the most used methods to determine this optimal number of groups: Elbow method, Silhouette method and the Gap statistic. Let's see if they match.
+Below are three of the most used methods to determine this optimal number of groups: Elbow method, Silhouette method and the Gap statistic.
+Let's see if they match.
 
 ```{r}
 #Elbow method
 set.seed(123)
 fviz_nbclust(datos_cluster, kmeans, method = "wss")
 ```
+
 We could appreciate the "elbow" for the number of 2 clusters.
+
 ```{r}
 #Silhouette Method
 set.seed(123)
@@ -1179,12 +1280,15 @@ set.seed(123)
 gap_stat <- clusGap(datos_cluster, FUN = kmeans, nstart = 25,K.max = 10, B = 50)
 fviz_gap_stat(gap_stat)
 ```
+
 ### 6.5 Analysis of results
+
 After the detailed analysis of the optimal number of clusters, carried out in the previous section, K=2 seems to be the most appropriate number of groups for this analysis.
 It matches with our original dataset which classifies data into 2 groups, M and B.
 
-Finally, when we know the optimal number of clusters, we use non-hierarchical clustering through the K-means algorithm to classify data into this 2 groups and also get more cluster analysis information. 
+Finally, when we know the optimal number of clusters, we use non-hierarchical clustering through the K-means algorithm to classify data into this 2 groups and also get more cluster analysis information.
 We use then K-means function.
+
 ```{r}
 set.seed(123)
 k2 <- kmeans(datos_cluster, 2, nstart = 25)
@@ -1194,11 +1298,15 @@ str(k2)
 ```
 
 A visual way to summarize the results elegantly and with straightforward interpretation is by using the fviz_cluster function.
+
 ```{r}
 set.seed(123)
 fviz_cluster(k2,data=datos_cluster)
 ```
-The last thing, like an interesting point, is that it is possible to extract the clusters and add them to our initial data to provide some cluster-level descriptive statistics. We already have this information in our original dataset but we show how it works.
+
+The last thing, like an interesting point, is that it is possible to extract the clusters and add them to our initial data to provide some cluster-level descriptive statistics.
+We already have this information in our original dataset but we show how it works.
+
 ```{r}
 datos_cluster %>%
 mutate(Cluster = k2$cluster) %>%

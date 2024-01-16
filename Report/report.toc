@@ -1,3 +1,9 @@
-\babel@toc {spanish}{}\relax 
+\babel@toc {nil}{}\relax 
 \contentsline {section}{\numberline {1}Abstract}{3}{section.1}%
 \contentsline {section}{\numberline {2}Introduction}{4}{section.2}%
+\contentsline {section}{\numberline {3}Materials and Methods}{5}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Database's description}{5}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Statistical methods}{6}{subsection.3.2}%
+\contentsline {section}{\numberline {4}Results}{7}{section.4}%
+\contentsline {section}{\numberline {5}Discussion}{8}{section.5}%
+\contentsline {section}{\numberline {6}Conclusion}{8}{section.6}%

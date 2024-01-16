@@ -130,4 +130,152 @@ This statistical exploration extends beyond immediate diagnostic applications. B
 
 In this journey, our objective is twofold: to enhance the accuracy of breast cancer diagnosis by identifying morphological indicators specific to various cancer forms and to contribute to a broader understanding of the disease's intricacies. As we dissect the statistical nuances associated with morphological variations, we envision a future where diagnostic tools are not only more precise but also inherently adaptable to the diverse manifestations of breast cancer. Through this statistical lens, our exploration aspires to redefine the paradigm of breast cancer diagnosis, providing a foundation for more effective interventions and advancing the collective understanding of this complex and multifaceted disease
 
+\newpage
+
+\section{Materials and Methods}
+
+\subsection{Database's description}
+
+This dataset contains information about breast cancer cell nuclei, with features computed from digitized images of fine needle aspirates (FNA) of breast masses. The dataset is collected from 569 patients based on 10 different indicators of breast cancer. It has three different measures for each indicator, each one corresponding to a spacial dimensions (XYZ axis). \\
+
+Therefore, the whole dataset  is made up of 569 samples and 30 features, plus two additional features that are the ID (it is not interesting in our case) and the Diagnosis (target of the study).\\
+
+
+The ten real-valued features for each cell nucleusa are the followings: \\
+
+\begin{itemize}
+	\item Radius (mean of distances from center to points on the perimeter)
+	\item Texture (standard deviation of gray-scale values)
+	\item Perimeter
+	\item Area
+	\item Smoothness (local variation in radius lengths)
+	\item Compactness ($\frac{\text{perimeter}^2}{\text{area} - 1.0}$)
+	\item Concavity (severity of concave portions of the contour)
+	\item Concave points (number of concave portions of the contour)
+	\item Symmetry
+	\item Fractal dimension ("coastline approximation" - 1)
+\end{itemize}
+
+
+These features describe characteristics of cell nuclei. The dataset was obtained from images available at \url{http://www.cs.wisc.edu/~street/images/}. \\
+
+On the following table there are some important statistics measures for our dataset that could be interesting to know. 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=1\textwidth]{statistics_measures}
+	\caption{Principal measures for some features.}
+	\label{fig:etiqueta}
+\end{figure}
+
+NOTE: As the number of features is too high to show all the measures, we have just attached the table with some of them.
+
+\subsection{Statistical methods}
+
+Our proyect has been divided in different sections, where we apply different statistical methods, which will help us to interpretate the results and achieve a better performance. \\
+
+
+At the beginning, along the second section  we have applied a \textbf{univariate} exploratory analysis, to be aware of what types of data we are working on. More precisely:
+
+\begin{itemize}
+	\item \textbf{Missing values:} we have studied the presence of missing values on all the features of our dataset, although we have not found anyone.  If there were any missing value we would analyze the random patterns on them. For that as we have continuous variables we would have applied a Student test, and then replacing them by the mean or median.
+	
+	\item \textbf{Outliers:}  As some methods we apply along our proyect are sensitive to the presence of outliers we have identified the outliers in each feature. As we have found too many outliers, we have decided to replace them by the mean, as this option was the one which gave us better results. 
+	
+	
+	\item \textbf{Classical numeric descriptive analysis:} For each feature we have computed a "summary" of some interesting statistics measures such as Minimun value, First Quantile, Median, Mean, Third Quantile and Maximum value. Furthermore, we have plot the histograms of each feature, their density and boxplot for a better understanding of the dataset.
+	
+	\item \textbf{Univariate normality:} as many techniques can not avoid the assumption of normality, we have checked the distribution of each feature of our dataset using two different methods. One which is graphical, using the function qqplot, and the second which apply the Shapiro-Wilk test.\\
+	
+\end{itemize}
+
+Secondly we have performed a \textbf{multivariate} exploratory analysis using different techniques such as: 
+
+\begin{itemize}
+	\item \textbf{Correlation:} we have studied the correlation between the features at two different levels; samplet level, with the corresponding correlation matrix, and at population level, with the Berlett's test. 
+	
+	\item \textbf{Multivariate normality:} in order to check if the distribution of our data follows a multivariate normal distribution we have performed some test to check  this assumption. We have applied the Royston's test and the Henze-Zirkler's test. Previuosly, we have dealt with the presence of the outliers as we know that these tests are sensitive to the presence of the outliers.
+	
+\end{itemize}
+
+After checking all these assumptions, we have applied some other methods that will give us the principal results of the proyect, such as Principal Componente Analysis, Factorial Analysis, Linear Discriminant Analysis and Quadratic Discriminant Analysis for building a classification model. Additionally, the Cluster Analysis has been done to complete our research. We will explain all these techniques more precisely along the following sections.
+
+\newpage
+
+\section{Results}
+
+In this section, we will examine the results of the previously mentioned methods from an objective standpoint. \\
+
+Firstly, it is remarkable that we have not dealt with missing values as we have not them  in our dataset. Meanwhile, for the outliers, as explained before, we have replace them by the mean value of each feature. We have considered as outliers the values that are not inside the interquartile range (IQR). \\
+
+
+The \textbf{univariate normality analysis} have shown that almost every feature of our dataset does not follow a normal distribution. Apart of graphics plot (qq-plots) the Shapiro-Wilk test gave us for each feature a p-value smaller than 0.05 (except for the feature "smoothness1"). \\
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.4\textwidth]{shapiro_wilktest.png}
+	\caption{Results of Shapiro-Wilk test.}
+	\label{fig:etiqueta2}
+\end{figure}
+
+Regarding the independence of the variables, the \textbf{correlation} method at sample level has given us a correlation matrix with almost non-zero coefficients. Even, we can find high correlation coefficients between some features. Applying \textbf{the Bartlett's sphericity test} for studying the correlation at population level, we have reach that the null hypothesis is rejected (we obtained a p-value of 0). Therefore, we can conclude after these results that the features of our dataset are correlated, and therefore not independent.  \\
+
+ 
+Therefore, as the features are mainly correlated, it is logical to apply a dimensionaly reduction through PCA or FA:
+%TODO (KERCHAK) EXPLICAR LOS RESULTADOS OBJETIVAMENTE 
+\begin{itemize}
+	\item \textbf{Principal Component Analysis:}
+	
+	\item \textbf{Factorial Analysis:}\\
+	
+\end{itemize} 
+
+Finally, we have proceeded with the \textbf{Discriminant Analysis}. For ensuring the 
+veracity of the results of the different discriminant analysis methods that we have applied, we have studied again (but this time with the target variable) the univariate  normality of the data. The results have been the same, and for the multivariate normality too. Therefore, despite the lack of normality in our whole dataset, we built the two models (linear and quadratic) for the Discriminant Analysis. It is remarkable that in the following section we will address these issues and how can we interpretate these results.  
+
+\begin{itemize}
+	\item \textbf{Linear Discriminant Analysis:}
+	
+	\item \textbf{Quadratic Discriminant Analysis:}\\
+	
+\end{itemize} 
+
+The following attached images presents a comparison between the results obtained from these Discriminant Analysis methods.
+
+
+%TODO(NOTE)
+
+
+\section{Discussion}
+
+Along this section we will interpretate the different results obtained, and which decisions we have made in each step of the process. \\
+
+Once the data have been preprocessed, we have studied the correlation between variables. As the results were clearly enough to say that our features were not independent, we have made a PCA and FA in order to reduce the dimension of our dataset. \\
+
+%TODO (KERCHAK) INTERPRETAR UN POCO LOS RESULTADOS OBTENIDOS EN PCA Y FA
+
+
+
+Before continue with the next steps, we needed to decide if we should finally reduce the dimension of our dataset or not. We decided not to reduce the dimension of our dataset, basing our decision in two key factos: the dimension of our dataset (30 features) is not huge enough to make the computational cost too high, so regarding this factor it is not necessary to reduce dimension. The other factor was the nature of our dataset; as we were stuying medical features, we were not interesting in taking less features by making combination of them. This would lead in "not interpetable" features and in this study we are not interesting in losing the capacity of interpretate each feature. Therefore, despite we have made the study of PCA and FA, the following results are obtained regarding that we have not made dimensionaly reduction. \\
+
+
+%TODO INTERPRETACION CON YANDEL SOBRE SU DISCRIMINANT ANALYSIS%
+Finally, 
+
+
+\section{Conclusion}
+
+After, this riguruous analysis of the data  we can conclude some imporant facts. Firstly, the dataset was hard to work with, as the most part of the results obtained from the different test were the opposite of what we could expect. Secondly, we have learnt that despite applying dimensionality reduction could be interesting in some cases, in our case it was not too much interesting, as we wanted to be able to interprate the features at the final, as the variables of the dataset were precise measures of the diseases. \\
+
+Another fact we have noticed along the proyect has been that not every dataset will produce the same results, and not what we "want" to get. In real life, the studies will be done in datasets that probably will not follow the "rules" we expect, and therefore, we have to be careful with the results we obtained for the models for example, as the might be not too much reliable.\\
+
+To sum up, this proyect has allowed us to know more about the multivariate analysis of real problems, and to learn how to adapt our interpretation to unexpected results. It is remarkable, that the way this proyect it is focused will help us in the future too for machine learning proyect, to make the right statistical analysis for the data, and to make right interpretations of the prediction model. \\
+
+
+ 
+
+
+
+
+
 \end{document}
