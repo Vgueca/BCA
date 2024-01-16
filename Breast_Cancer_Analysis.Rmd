@@ -1,3 +1,9 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
 # BREAST CANCER ANALYSIS
 
 Along this Rnotebook we will analyze the features obtained from the [Breast Cancer's Dataset](https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic). We will apply the methods and techniques seen during the course of Multivariate Statistics of the University of Granada.

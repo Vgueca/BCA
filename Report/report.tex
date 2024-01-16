@@ -89,7 +89,7 @@
 	{\Large Juan Valentín Guerrero Cano \par}
 	
 	\vfill
-	{\Large December 2023 \par}
+	{\Large Course 2023-2024 \par}
 \end{titlepage}
 
 \thispagestyle{empty}
@@ -122,12 +122,59 @@ By improving diagnostic precision, the study contributes to early and personaliz
 \newpage
 
 \section{Introduction}
-Within the intricate realm of breast cancer, achieving precise diagnosis stands as a pivotal frontier with profound implications for patient outcomes. Recognizing the limitations of conventional diagnostic paradigms, this study embarks on a meticulous exploration, employing advanced statistical techniques—discriminant analysis, dimensionality reduction through factorial analysis, principal component analysis, etc. The focal point is the unraveling of the intricate tapestry of indicators inherent in breast cancer datasets, particularly those associated with the diverse morphological forms exhibited across various cancer samples. \\
+In the intricate realm of breast cancer, the quest for precise diagnosis demands a sophisticated analytical approach that transcends conventional methods. This study embarks on a meticulous exploration, leveraging advanced statistical techniques—discriminant analysis, dimensionality reduction through factorial analysis, and principal component analysis. Our focus centers on unraveling the intricate tapestry of morphological indicators within breast cancer datasets, specifically those linked to diverse sample forms across various cancers.
 
-The amalgamation of genetic, clinical, and morphological indicators demands a nuanced analytical approach. Through discriminant analysis, we aim to uncover distinctive patterns characterizing benign and malignant tumors, pushing beyond the constraints of traditional diagnostic methods. Simultaneously, the application of factorial and principal component analyses allows us to distill essential information from the complex dataset, shedding light on the factors that truly drive breast cancer classification. \\
+The amalgamation of genetic, clinical, and morphological indicators necessitates a nuanced statistical lens. Through discriminant analysis, we aim to unveil distinctive morphological patterns characterizing benign and malignant tumors, pushing the boundaries of traditional diagnostic methods. Simultaneously, the application of factorial and principal component analyses enables us to distill essential information from the complex dataset, shedding light on the mathematical factors that truly drive breast cancer classification.
 
-This statistical exploration extends beyond immediate diagnostic applications. By identifying morphological indicators related to diverse cancer samples, we not only refine diagnostic precision but also offer insights into the underlying biological relationships governing the manifestation of different forms of breast cancer. This statistical lens enables us to navigate the complexities of the disease, revealing hidden patterns and connections that may inform future avenues of research. \\
+This statistical exploration transcends immediate diagnostic applications. By identifying morphological indicators tied to diverse cancer samples, we not only enhance diagnostic precision but also contribute to a deeper mathematical understanding of the underlying relationships governing the manifestation of different forms of breast cancer. This statistical lens empowers us to navigate the complexities of the disease, unveiling hidden mathematical patterns and connections that may inform novel avenues of research.
 
-In this journey, our objective is twofold: to enhance the accuracy of breast cancer diagnosis by identifying morphological indicators specific to various cancer forms and to contribute to a broader understanding of the disease's intricacies. As we dissect the statistical nuances associated with morphological variations, we envision a future where diagnostic tools are not only more precise but also inherently adaptable to the diverse manifestations of breast cancer. Through this statistical lens, our exploration aspires to redefine the paradigm of breast cancer diagnosis, providing a foundation for more effective interventions and advancing the collective understanding of this complex and multifaceted disease
+In this journey, our objective is twofold: to refine breast cancer diagnosis by identifying morphological indicators associated with various cancer forms through advanced statistical analyses and to contribute to a broader mathematical understanding of the intricate relationships within the disease. As we dissect the statistical nuances associated with morphological variations, we envision a future where mathematical tools are not only more precise but also inherently adaptable to the diverse manifestations of breast cancer. Through this statistical lens, our exploration aspires to redefine the mathematical paradigm of breast cancer diagnosis, providing a foundation for more effective interventions and advancing the collective mathematical understanding of this complex and multifaceted disease.
+
+This study aims to refine breast cancer diagnosis by identifying morphological indicators associated with various cancer forms through advanced statistical analyses, simultaneously contributing to a broader mathematical understanding of the intricate relationships within the disease.
+
+\newpage
+
+\section{Materials and Methods}
+\subsection{Materials}
+
+For this study, we have used a public Data Base published by the University of California, at its Machine Learning Repository. This database contains information about 30 `different' features measured through 569 instances of breast cancers. In fact, we do not have 30 features, we have 10, but because most of them refers to spatial measures, we have 3 for each one of this type (\(x,y,z\)). The ten real-valued feautres are computed for each cell nuclues:
+
+\begin{itemize}
+	\item Radius (mean of distances from center to points on the perimeter).
+	\item Texture (standard deviation of gray-scale values).
+	\item Perimeter.
+	\item Area.
+	\item Smoothness (local variation in radius lengths).
+	\item Compactness (\(perimeter^2\) / \(area - 1.0\)).
+	\item Concavity (severity of concave portions of the contour).
+	\item Symmetry.
+	\item Fractal dimension ("coastline approximation" - 1).
+\end{itemize}
+
+Due to the size of the features, we recommend to consult the \texttt{R} report of this work to see a summary of the principal position, dispersion and form measures of the features of the database. The table is at section 2.3, where we can find all this interest data.
+
+\subsection{Statiscal methods}
+
+
+\subsubsection{Univariate exploratory analysis}
+First of all we have conducted an \textbf{univariate exploratory analysis}. Regarding the types of values we have on the dataset, we are not interested on perform any type of data-grouping.
+
+We computed the porcentge of missing values, and we saw that there are not missing values. \\
+
+Secondly, we went trough a classical numeric descriptive analysis where the basic numerical descriptive statistics such as principal position, dispersion and form measures were given. We also computed their histograms, boxplots and density graphs. \\
+
+Thirdly, we tried to identify extreme values or outliers. Firstly, we standarized the data to avoid the different scales of our feautres. The decision took for the outliers were to substitute them with the median, due it works better than substituting with the mean. \\
+
+Lastly, to avoid the assumption of normality, we checked the distribution of each feature of the dataset. We did it in a graphical way and using the Shapiro-Wilk test.
+
+\subsubsection{Multivariate Exploratory Analysis}
+First of all, we checked some conditions that are necessary to apply the different multivariate analysis techniques:
+
+\begin{itemize}
+	\item It is necessary to check if the variables are or no independent. At popultation level, we checked \textbf{correlation} using \textit{Bartlett's Test}.
+	\item We also checked the multivariant normality, using the \textit{Henze-Zirkler} test and \textit{Royston} test. It is important to remark that these tests could be perturbated because the presence of outliers, so we had to eliminate them.
+\end{itemize}
+
+Once checked all this conditions, we had applied different techniques of Multivariant Analysis. We conducted a \textbf{Principal Component Analysis (PCA)} to reduce the dimension of the problem using observable  variables. After it, we made a \textbf{Factorial Analysis} to identify potential \textit{latent variables} (no observable) that have a high correlation with a group of observable variables and no correlation with the others. Lastly, we performed a \textbf{Discriminant Analysis} (\textbf{Linear} and \textbf{Quadratic}) to establish a classification method of new observations of a cualitative variable according to its characteristics (predictors).
 
 \end{document}
