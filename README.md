@@ -12,4 +12,4 @@ The dataset used in this project is a public dataset available at https://archiv
 3. **Multivariate Statistical Modeling**: We apply multivariate statistical techniques to uncover patterns and relationships in the data.
 
 ## Results
-The results of our analysis are presented at ...
+The results of our analysis are presented at the "Report" folder, where we have documented thoroughly all the steps we have made as well as the meaning of the different results obtained.
