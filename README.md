@@ -1,4 +1,4 @@
-# Multivariate Statistics Project: Breast Cancer Analysis
+# Multivariate Statistics Project: Breast Cancer Analysis (BCA)
 
 ## Project Description
 This project aims to apply multivariate statistical techniques to analyze a public dataset on breast cancer.
